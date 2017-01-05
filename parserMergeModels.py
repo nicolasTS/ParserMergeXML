@@ -22,46 +22,46 @@ import pickle
 #get all assig
 # recuperation en 1ier pour apres trier la liste des parametres cinetiques cad constant[] et assignement[]
 def getAllAssig(listeModels):
-	#listeNamesAssig = []
-	#listeValuesAssig = []
-	dicoAssign = {}
+	listeNamesAssig = []
+	listeValuesAssig = []
+
 	for iModels in listeModels:
 		for i in range(iModels.getNumRules()):
+
 			# necessaire a cause des ( et ) afin d avoir un espace entre!
 			a = iModels.getRule(i).getFormula()
 			tmp = a.replace('(',' ( ')
 			tmp2 = tmp.replace(')',' ) ')
-#			dicoAssign[" " + iModels.getRule(i).getVariable()+ " "] = " "+iModels.getRule(i).getFormula()+" "
-			dicoAssign[" " + iModels.getRule(i).getVariable()+ " "] = " "+str(tmp2)+" "
+		
 
-			
-	return dicoAssign
-
-"""
 			listeNamesAssig.append(" " + iModels.getRule(i).getVariable()+ " ")
-			listeValuesAssig.append(" "+ iModels.getRule(i).getFormula() + " ")
+			listeValuesAssig.append(" "+ tmp2 + " ")
+		
+
 	return listeNamesAssig, listeValuesAssig
-"""
-# a mettre dans un dico les assign
+
 
 
 # get all Kinetics Parameters
 def getAllKineticsParameters(listeModels):
 	listeNamesKineticsParameters=[]
 	listeValuesKineticsParameters=[]
-	dicoAssign = getAllAssig(listeModels)
-	# name et value des kinetics parameters dans des listes
+	# names et values des assign
+	listeNamesAssig, listeValuesAssig = getAllAssig(listeModels)
+	# names et values des kinetics parameters dans des listes
 	for iModels in listeModels:
 		for i in range(iModels.getNumParameters()):
 			listeNamesKineticsParameters.append(" " + iModels.getParameter(i).getId()+ " ")
 			listeValuesKineticsParameters.append(iModels.getParameter(i).getValue())
 
-	#suppression des assign de la liste des kinetics parameters (name et values)
-	for i, n in enumerate(listeNamesKineticsParameters):
-		if (n in dicoAssign.keys() ):
-			del listeNamesKineticsParameters[i]
-			del listeValuesKineticsParameters[i]
-							
+	# suppression des assign de la liste des prm cinetiques
+	for nAssign in listeNamesAssig:
+		for i, n in enumerate(listeNamesKineticsParameters):
+			if (n == nAssign):
+				#print "trouvé " + str(n) + " position " + str(i)
+				del listeNamesKineticsParameters[i]
+				del listeValuesKineticsParameters[i]
+		
 	return listeNamesKineticsParameters, listeValuesKineticsParameters
 
 
@@ -93,11 +93,12 @@ def getAllReactions(listeModels):
 
 
 #get all asign indexed
-def getAllAssignIndexed(dicoAssignements,dicoSpecies, listeKineticsParameters ):
+def getAllAssignIndexed(listeNamesAssig, listeValuesAssig,dicoSpecies, listeKineticsParameters ):
 	listeNamesAsignIndexed = []
 	listeReactAsignIndexed = []
 
-	for index, (iNameAssign,iReactAssign)  in enumerate(dicoAssignements.iteritems()):
+	for index, (iNameAssign,iReactAssign)  in enumerate(zip(listeNamesAssig, listeValuesAssig)):
+
 		#print iReactAssign
 		r = iReactAssign
 		# indexation des prms cinetiques
@@ -122,7 +123,7 @@ def getAllAssignIndexed(dicoAssignements,dicoSpecies, listeKineticsParameters ):
 		            pass
 		
 		#indexation des assign car un assign peut contenir un autre assign
-		for i, tNameAssign in enumerate(dicoAssignements.keys()):
+		for i, tNameAssign in enumerate(listeNamesAssig):
 			#print t + " " + str(len(tNameAssign))
 		 
 			try:
@@ -130,14 +131,13 @@ def getAllAssignIndexed(dicoAssignements,dicoSpecies, listeKineticsParameters ):
 		                indexSpeciesInReaction = r.index(tNameAssign)
 		                temp=r[0:indexSpeciesInReaction]+" assignments["+str(i)+"] "+r[indexSpeciesInReaction+len(tNameAssign):]
 				r=temp
-				print r
+				#print r
 
 		        except:
 		            pass
 					
 
 		listeReactAsignIndexed.append(r)
-#		listeNamesAsignIndexed.append("assignments[" + str(index) + "]")
 		listeNamesAsignIndexed.append(iNameAssign)
 
 		
@@ -149,7 +149,8 @@ def getAllPartialEquationsIndexed(listeReactions, listeSpecies, listeKineticsPar
 	listeR = []
 	listeReactionsIndexer=[]
 	for iReaction in listeReactions:
-		r = " " + str(iReaction.getKineticLaw().getFormula()) + " " 
+		r = " " + str(iReaction.getKineticLaw().getFormula()) + " "
+		#print r
 		listeR.append(r)
 		# indexation des species
 		for i, iSpecie in enumerate(listeSpecies):
@@ -175,16 +176,15 @@ def getAllPartialEquationsIndexed(listeReactions, listeSpecies, listeKineticsPar
 	
 
 		for i , iAssign in enumerate(listeAssignements):
+			#print iAssign
 			try:
 				while iAssign in r:
 					indexAssignInReaction = r.index(iAssign)
 					temp3 = r[0:indexAssignInReaction]+" assignments["+str(i)+"] "+r[indexAssignInReaction+len(iAssign):]
 		        	    	r=temp3
+					#print r
 		    	except:
 		        	pass
-#assignments
-
-
 
 		listeReactionsIndexer.append(r)
 
@@ -232,11 +232,6 @@ def getGlobalEquations(listeReactions, listeSpecies):
 		RES2="" 
 
 
-	#print "les reactions Negatives: "+str(RES3)
-	#print "les reactions positives: "+str(RRES3)
-	      
-
-
 
 	Rtot=[]
 	for i in range(len(listeSpecies)):
@@ -246,7 +241,6 @@ def getGlobalEquations(listeReactions, listeSpecies):
 	#print "GlobalEquations: "+str(Rtot)    
 
 	
-
 	return Rtot
 
 
@@ -267,27 +261,17 @@ def writeODESystem(listeModels, merge_params, simu_params):
 
 
     listeNamesKineticsParameters, listeValuesKineticsParameters= getAllKineticsParameters(listeModels)
-    dicoAssign = getAllAssig(listeModels)
+    listeNamesAssig, listeValuesAssig  = getAllAssig(listeModels)
+
     dicoSpecies, dicoBondaries = getAllSpecies(listeModels)
     print "BONDARIES "
     print dicoBondaries.keys()
-    listeNamesAssignIndexer, listeReactAssignIndexer= getAllAssignIndexed(dicoAssign,dicoSpecies.keys(), listeNamesKineticsParameters )
+    listeNamesAssignIndexer, listeReactAssignIndexer= getAllAssignIndexed(listeNamesAssig, listeValuesAssig,dicoSpecies.keys(), listeNamesKineticsParameters )
     listeReactions = getAllReactions(listeModels)
-    listeR, listeReactionsIndexer = getAllPartialEquationsIndexed(listeReactions, dicoSpecies.keys(),listeNamesKineticsParameters,dicoAssign.keys() )
+    listeR, listeReactionsIndexer = getAllPartialEquationsIndexed(listeReactions, dicoSpecies.keys(),listeNamesKineticsParameters,listeNamesAssig )
     globalEq = getGlobalEquations(listeReactions, dicoSpecies.keys())
 
-    """
-# check consitence du fichier PRMS.py
-    if ( len(timePulse) < len(listeBondaries.keys()) ):
-	print "Pb with time Pulse need "
-	print listeBondaries.keys()
-	sys.exit()
 
-    if ( len(valuePulse) < len(listeBondaries.keys()) ):
-	print "Pb with value Pulse need "
-	print listeBondaries.keys()
-	sys.exit()
-    """
 
     with open(writePythonFolder+os.sep + "ODESystems.py","w") as monFichier:
         monFichier.write("try:\n")
@@ -304,10 +288,11 @@ def writeODESystem(listeModels, merge_params, simu_params):
         monFichier.write("constants = cvode.NVector(zeros("+str(len(listeNamesKineticsParameters))+"))\n")
 	# nombre de species
         monFichier.write("X = cvode.NVector(zeros("+str(len(dicoSpecies.keys()))+"))\n")
-	if(len(dicoAssign.keys()) == 0):
+
+	if(len(listeNamesAssig) == 0):
 		monFichier.write("assignments = cvode.NVector(zeros("+str(1) +"))\n")
 	else :
-	        monFichier.write("assignments = cvode.NVector(zeros("+str(len(dicoAssign.keys())) +"))\n")
+	        monFichier.write("assignments = cvode.NVector(zeros("+str(len(listeNamesAssig)) +"))\n")
 	# nombre d events = nombre de bondaries
         monFichier.write("events = cvode.NVector(zeros("+ str(len(dicoBondaries.keys())) +"))\n\n")
         monFichier.write("t = cvode.realtype(0.0)\n\n\n\n")
@@ -368,7 +353,7 @@ def writeODESystem(listeModels, merge_params, simu_params):
 
 	for i, (k, v) in enumerate(zip(listeNamesAssignIndexer, listeReactAssignIndexer)):
 		monFichier.write('\tassignments[' + str(i) + '] = ' + str(v) + "  # " + str(k) + "\n") 
-##################################################################################################################################### A verifier 
+
 
 	for i, iName in enumerate(namePulse):
 		monFichier.write('\t#'+iName + ' = 0'+ "\n")
@@ -413,12 +398,12 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
     nameSaveEvents = simu_params['nameSaveEvents']
     namePulse =simu_params['namePulse']
 
- #   listeSpecies, listeBondaries = getAllSpecies(listeModels)
 
     listeNamesKineticsParameters, listeValuesKineticsParameters= getAllKineticsParameters(listeModels)
-    dicoAssign = getAllAssig(listeModels)
+    listeNamesAssig, listeValuesAssig = getAllAssig(listeModels)
+
     dicoSpecies, dicoBondaries = getAllSpecies(listeModels)
-    listeNamesAssignIndexer, listeReactAssignIndexer= getAllAssignIndexed(dicoAssign,dicoSpecies.keys(), listeNamesKineticsParameters )
+    listeNamesAssignIndexer, listeReactAssignIndexer= getAllAssignIndexed(listeNamesAssig, listeValuesAssig,dicoSpecies.keys(), listeNamesKineticsParameters )
   
 
     with open(writePythonFolder+os.sep + "SimulatoreCore.py","w") as monFichier:
@@ -483,7 +468,7 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
 	listOfY=listOfY[:-1]+"]"
 
 
-############################################################################################################################ a re voir
+
 	listOfAssig = "[ "
 	for i in range(len(nameSaveAssig)):
 		listOfAssig+="assigsave_"+str(i)+","
@@ -492,7 +477,7 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
 		pos = listeNamesAssignIndexer.index(" "+ str(nameSaveAssig[i]) + " ")
 		monFichier.write("assigsave_" + str(i) + ".append(assignments[" + str(pos) + "])\n\n")
 	listOfAssig=listOfAssig[:-1]+"]"
-##################################################################################################################
+
 
 	listOfEvents = "[ "
 	for i in range(len(nameSaveEvents)):
@@ -526,7 +511,7 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
 	for i in range(len(nameSaveY)):
 		pos = dicoSpecies.keys().index(" "+ str(nameSaveY[i]) + " ")	
 		monFichier.write("\tysave_" + str(i) + ".append(X[" + str(pos) + "])\n\n")
-################################################################################################################################"	
+	
 	for i in range(len(nameSaveAssig)):
 		pos = listeNamesAssignIndexer.index(" "+ str(nameSaveAssig[i]) + " ")
 		monFichier.write("\tassigsave_" + str(i) + ".append(assignments[" + str(pos) + "])\n\n")
@@ -615,43 +600,8 @@ listeModels.append(document2.getModel());
 print "List of XML files: "
 print listeModels
 
-"""
-print "PARAMETERS" 
-npk, vpk = getAllKineticsParameters(listeModels)
 
-for iP, jP in zip(npk, vpk):
-	print str(iP) + " = " + str(jP)
-
-print "ASSIGNEMENT"
-dicoAssign = getAllAssig(listeModels)
-print dicoAssign.keys()
-
-
-print "SPECIES and BONDARIES"
-dicoSpecies, dicoBondaries = getAllSpecies(listeModels)
-
-print dicoSpecies.keys()
-print dicoBondaries.keys()
-
-
-print "REACTIONS "
-listeReactions = getAllReactions(listeModels)
-listeR, listeReactionsIndexer = getAllPartialEquationsIndexed(listeReactions, dicoSpecies.keys(),npk, dicoAssign.keys())
-
-print listeReactionsIndexer
-
-
-print "GLOBAL REACTIONS"
-globalEq = getGlobalEquations(listeReactions, dicoSpecies.keys())
-print globalEq
-
-
-sys.exit()
-
-"""
 writeODESystem(listeModels, merge_params, simu_params)
-
-
 
 writeSimulatorCore(listeModels, merge_params, simu_params)
 
