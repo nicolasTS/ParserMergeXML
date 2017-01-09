@@ -67,16 +67,33 @@ def getAllKineticsParameters(listeModels):
 
 # get all Species
 def getAllSpecies(listeModels):
-    	dicoSpecies={}
-	dicoBondaries = {}
+	listeNamesSpecies = []
+	listeValuesSpecies = []
+	listeNamesBondaries = []
+	listeValuesBondaries = []
+
 	for iModels in listeModels:
 		for i in range(iModels.getNumSpecies()):
 			if not (iModels.getSpecies(i).getBoundaryCondition()):
-				dicoSpecies[" " + iModels.getSpecies(i).getName()+ " "] = iModels.getSpecies(i).getInitialAmount()
+				listeNamesSpecies.append(" " + iModels.getSpecies(i).getName()+ " ")
+				listeValuesSpecies.append(iModels.getSpecies(i).getInitialAmount())
 			else:
-				dicoBondaries[iModels.getSpecies(i).getName()] = iModels.getSpecies(i).getInitialAmount()
+				listeNamesBondaries.append(iModels.getSpecies(i).getName())
+				listeValuesBondaries.append(iModels.getSpecies(i).getInitialAmount())
 			
-    	return dicoSpecies, dicoBondaries
+	
+	#print "listeNamesSpecies \n"
+	#print listeNamesSpecies
+
+	#print "listeValuesSpecies \n"
+	#print listeValuesSpecies
+
+	#print "listeNamesBondaries \n"
+	#print listeNamesBondaries
+
+	#print "listeValuesBondaries \n"
+	#print listeValuesBondaries
+	return listeNamesSpecies, listeValuesSpecies, listeNamesBondaries, listeValuesBondaries
 
 
 
@@ -263,13 +280,15 @@ def writeODESystem(listeModels, merge_params, simu_params):
     listeNamesKineticsParameters, listeValuesKineticsParameters= getAllKineticsParameters(listeModels)
     listeNamesAssig, listeValuesAssig  = getAllAssig(listeModels)
 
-    dicoSpecies, dicoBondaries = getAllSpecies(listeModels)
+    listeNamesSpecies, listeValuesSpecies, listeNamesBondaries, listeValuesBondaries = getAllSpecies(listeModels)
+
     print "BONDARIES "
-    print dicoBondaries.keys()
-    listeNamesAssignIndexer, listeReactAssignIndexer= getAllAssignIndexed(listeNamesAssig, listeValuesAssig,dicoSpecies.keys(), listeNamesKineticsParameters )
+    print listeNamesBondaries
+
+    listeNamesAssignIndexer, listeReactAssignIndexer= getAllAssignIndexed(listeNamesAssig, listeValuesAssig,listeNamesSpecies, listeNamesKineticsParameters )
     listeReactions = getAllReactions(listeModels)
-    listeR, listeReactionsIndexer = getAllPartialEquationsIndexed(listeReactions, dicoSpecies.keys(),listeNamesKineticsParameters,listeNamesAssig )
-    globalEq = getGlobalEquations(listeReactions, dicoSpecies.keys())
+    listeR, listeReactionsIndexer = getAllPartialEquationsIndexed(listeReactions, listeNamesSpecies,listeNamesKineticsParameters,listeNamesAssig )
+    globalEq = getGlobalEquations(listeReactions, listeNamesSpecies)
 
 
 
@@ -287,41 +306,34 @@ def writeODESystem(listeModels, merge_params, simu_params):
 	# nombre de prm cinetique
         monFichier.write("constants = cvode.NVector(zeros("+str(len(listeNamesKineticsParameters))+"))\n")
 	# nombre de species
-        monFichier.write("X = cvode.NVector(zeros("+str(len(dicoSpecies.keys()))+"))\n")
+        monFichier.write("X = cvode.NVector(zeros("+str(len(listeValuesSpecies))+"))\n")
 
 	if(len(listeNamesAssig) == 0):
 		monFichier.write("assignments = cvode.NVector(zeros("+str(1) +"))\n")
 	else :
 	        monFichier.write("assignments = cvode.NVector(zeros("+str(len(listeNamesAssig)) +"))\n")
 	# nombre d events = nombre de bondaries
-        monFichier.write("events = cvode.NVector(zeros("+ str(len(dicoBondaries.keys())) +"))\n\n")
+        monFichier.write("events = cvode.NVector(zeros("+ str(len(listeNamesBondaries)) +"))\n\n")
         monFichier.write("t = cvode.realtype(0.0)\n\n\n\n")
         
         monFichier.write("# BOUNDARY CONDITION\n")
         monFichier.write("########################################################\n\n")
-	
-	iEvent = 0
-	for iName in namePulse:
-		monFichier.write('events[' + str(iEvent) + '] = ' + str(dicoBondaries[iName]) + "  # " + str(iName) + "\n")
-		iEvent+=1
+	for i, (k, v) in enumerate(zip(listeNamesBondaries, listeValuesBondaries)):
+		monFichier.write('events[' + str(i) + '] = ' + str(v) + "  # " + str(k) + "\n")
 
 	monFichier.write("\n\n\n# KINETICS PARAMETERS\n")
-        monFichier.write("########################################################\n\n")
-     
+        monFichier.write("########################################################\n\n")   
 	for i, (k, v) in enumerate(zip(listeNamesKineticsParameters, listeValuesKineticsParameters)):
 		monFichier.write('constants[' + str(i) + '] = ' + str(v) + "  # " + str(k) + "\n")
 
 
  	monFichier.write("\n\n\n# SPECIES: INITIAL CONDITION\n")
         monFichier.write("########################################################\n\n")
-        
-        i = 0
-	for k, v in dicoSpecies.iteritems():
+	for i, (k, v) in enumerate(zip(listeNamesSpecies, listeValuesSpecies)):
 		monFichier.write('X[' + str(i) + '] = ' + str(v) + "  # " + str(k) + "\n")
-		i+=1
-
 
 	monFichier.write("\n\n\n# ASSIGNEMENTS\n")
+        monFichier.write("########################################################\n\n")
 	for i, (k, v) in enumerate(zip(listeNamesAssignIndexer, listeReactAssignIndexer)):
 		monFichier.write('assignments[' + str(i) + '] = ' + str(v) + "  # " + str(k) + "\n")	
 
@@ -402,8 +414,8 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
     listeNamesKineticsParameters, listeValuesKineticsParameters= getAllKineticsParameters(listeModels)
     listeNamesAssig, listeValuesAssig = getAllAssig(listeModels)
 
-    dicoSpecies, dicoBondaries = getAllSpecies(listeModels)
-    listeNamesAssignIndexer, listeReactAssignIndexer= getAllAssignIndexed(listeNamesAssig, listeValuesAssig,dicoSpecies.keys(), listeNamesKineticsParameters )
+    listeNamesSpecies, listeValuesSpecies, listeNamesBondaries, listeValuesBondaries = getAllSpecies(listeModels)
+    listeNamesAssignIndexer, listeReactAssignIndexer= getAllAssignIndexed(listeNamesAssig, listeValuesAssig,listeNamesSpecies, listeNamesKineticsParameters )
   
 
     with open(writePythonFolder+os.sep + "SimulatoreCore.py","w") as monFichier:
@@ -426,10 +438,10 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
         monFichier.write("cvode_mem = cvode.CVodeCreate(cvode.CV_BDF,cvode.CV_NEWTON)\n")
         monFichier.write("cvode.CVodeMalloc(cvode_mem,f,0.0,X,cvode.CV_SS,reltol,abstol)\n")
 
-	monFichier.write("cvode.CVodeRootInit(cvode_mem," + str(len(dicoBondaries))+",g,None)\n")
+	monFichier.write("cvode.CVodeRootInit(cvode_mem," + str(len(listeNamesBondaries))+",g,None)\n")
 
 
-        monFichier.write("cvode.CVDense(cvode_mem,"+str(len(dicoSpecies))+")\n\n")
+        monFichier.write("cvode.CVDense(cvode_mem,"+str(len(listeNamesSpecies))+")\n\n")
  
         monFichier.write("tf = "+ str(simuDuration) +"\n")
         monFichier.write("iout = 0\n")
@@ -463,7 +475,7 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
 		listOfY+="ysave_"+str(i)+","
 	        monFichier.write("ysave_"+str(i) +" = []\n")
 		# pour avoir correspondance entre nameSaveY et listeSpecies car dans dictionnaire pas d indexation
-		pos = dicoSpecies.keys().index(" "+ str(nameSaveY[i]) + " ")	
+		pos = listeNamesSpecies.index(" "+ str(nameSaveY[i]) + " ")	
 		monFichier.write("ysave_" + str(i) + ".append(X[" + str(pos) + "])\n\n")
 	listOfY=listOfY[:-1]+"]"
 
@@ -504,12 +516,13 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
         monFichier.write("\ttout = toutList[iout]\n")
         monFichier.write("\tflag = cvode.CVode(cvode_mem,tout,X,ctypes.byref(t),cvode.CV_NORMAL)\n")
         monFichier.write("\tif flag == cvode.CV_ROOT_RETURN:\n")
-        monFichier.write("\t\trootsfound = cvode.CVodeGetRootInfo(cvode_mem,"+ str(len(dicoBondaries))+")\n")
+        monFichier.write("\t\trootsfound = cvode.CVodeGetRootInfo(cvode_mem,"+ str(len(listeNamesBondaries))+")\n")
+
 	monFichier.write("\t\tupdate_rootsfound(rootsfound,t,reltol,abstol,cvode_mem)\n\n")
 
         monFichier.write("\ttsave.append(t.value)\n\n")
 	for i in range(len(nameSaveY)):
-		pos = dicoSpecies.keys().index(" "+ str(nameSaveY[i]) + " ")	
+		pos = listeNamesSpecies.index(" "+ str(nameSaveY[i]) + " ")	
 		monFichier.write("\tysave_" + str(i) + ".append(X[" + str(pos) + "])\n\n")
 	
 	for i in range(len(nameSaveAssig)):
@@ -591,10 +604,9 @@ listeModels = []
 document1 = readSBML(merge_params['listXMLFiles'][0]);
 listeModels.append(document1.getModel());
 
-"""
+
 document2 = readSBML(merge_params['listXMLFiles'][1]);
 listeModels.append(document2.getModel());
-"""
 
 
 print "List of XML files: "
