@@ -371,7 +371,11 @@ def writeODESystem(listeModels, merge_params, simu_params):
 	monFichier.write("def g(t, X, gout, g_data):\n\n")
 	for i in range(len(timePulse)):
         	#monFichier.write("\tgout["+ str(i) + "] = (t  - (" + 10.0)) * (t  - ( 11.0))\n")
-        	monFichier.write("\tgout["+ str(i) + "] = (t  - (" + str(timePulse[i][0]) +")) * (t  - ("+ str(timePulse[i][1]) +"))\n")
+        	#monFichier.write("\tgout["+ str(i) + "] = (t  - (" + str(timePulse[i][0]) +")) * (t  - ("+ str(timePulse[i][1]) +"))\n")
+
+        	monFichier.write("\tgout["+ str(i) + "] = (t  - (" + "simu_params['timePulse']["+str(i)+"][0])" +") * (t  - ("+"simu_params['timePulse'][" +str(i)+"][1])" +")\n")
+
+
         monFichier.write("\treturn 0\n\n\n")
 
         monFichier.write("def update_rootsfound(rootsfound,t,reltol,abstol,cvode_mem):\n\n")
@@ -386,7 +390,7 @@ def writeODESystem(listeModels, merge_params, simu_params):
 	
 	monFichier.write("def update_events(t):\n\n")
 	for i in range(len(timePulse)):
-		monFichier.write("\tif(not(t.value < " + str(timePulse[i][0])+ " or t.value > " + str(timePulse[i][1]) +")):\n")
+		monFichier.write("\tif(not(t.value < " +"simu_params['timePulse'][" +str(i)+"][0]"+ " or t.value > " + "simu_params['timePulse'][" +str(i)+"][1]" +")):\n")
 		monFichier.write("\t\tevents[" + str(i) + "] = simu_params['valuePulse'][" +str(i) + "] \n")
 		#monFichier.write("\t\tevents[" + str(i) + "] = "  +str(valuePulse[i]) + "\n")
 	monFichier.write("\treturn 0\n\n\n")
