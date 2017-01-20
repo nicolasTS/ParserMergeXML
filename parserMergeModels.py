@@ -315,8 +315,16 @@ def writeODESystem(listeModels, merge_params, simu_params):
 	monFichier.write("\n\n\n# KINETICS PARAMETERS\n")
         monFichier.write("########################################################\n\n")
      
-	for i, (k, v) in enumerate(zip(listeNamesKineticsParameters, listeValuesKineticsParameters)):
-		monFichier.write('constants[' + str(i) + '] = ' + str(v) + "  # " + str(k) + "\n")
+#	for i, (k, v) in enumerate(zip(listeNamesKineticsParameters, listeValuesKineticsParameters)):
+#		monFichier.write('constants[' + str(i) + '] = ' + str(v) + "  # " + str(k) + "\n")
+	
+	f = open(merge_params['outCsteFile'],'w')
+	for (k, v) in zip(listeNamesKineticsParameters, listeValuesKineticsParameters):
+		f.write(str(k) + "= " + str(v) + "\n")
+
+	monFichier.write("for i, line in enumerate(file(simu_params['inCsteFile'], 'r' )):\n")
+	monFichier.write("\t(a,b)=line.split(' = ')\n")
+	monFichier.write("\tconstants[i] = float(b)\n")
 
 
  	monFichier.write("\n\n\n# SPECIES: INITIAL CONDITION\n")
