@@ -568,7 +568,9 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
 	monFichier.write("listOfAssig = " + str(listOfAssig) + "\n")
 	monFichier.write("listOfEvents = " + str(listOfEvents) + "\n\n")
 
-	monFichier.write("writeAllResults('" + str(writePythonFolder) + "',tsave, nameSaveY  +nameSaveAssig+ nameSaveEvents, listOfY+ listOfAssig + listOfEvents )\n")
+	monFichier.write("writeAllResults("+"simu_params['outDirectory']" +",tsave, nameSaveY  +nameSaveAssig+ nameSaveEvents, listOfY+ listOfAssig + listOfEvents )\n")
+
+
 
     monFichier.close()
     return 0
