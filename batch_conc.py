@@ -15,9 +15,9 @@ import shutil
 
 # Ligand
 
-values = np.logspace(-6,1,20)
+values = np.logspace(-6,1,2)
 
-outDirectory = "DRC_ACh"
+outDirectory = "DRC_ACh_TEST"
 
 if(os.path.isdir(outDirectory) != True):
 		os.mkdir(outDirectory)
@@ -33,9 +33,12 @@ exec("from "+paramfilepath+" import *")
 # copy parameters files 
 shutil.copyfile("SimulatoreCore.py", outDirectory + os.sep+ "SimulatoreCore.py")
 shutil.copyfile("ODESystems.py", outDirectory + os.sep+ "ODESystems.py")
-shutil.copyfile("SaveData.py", outDirectory + os.sep+ "/SaveData.py")
+shutil.copyfile("SaveData.py", outDirectory + os.sep+ "SaveData.py")
+
+shutil.copyfile(simu_params['inCsteFile'], outDirectory + os.sep+ simu_params['inCsteFile'])
 
 
+#'inCsteFile' : "./Cstes.txt",
 #os.system("cd "+ outDirectory +os.sep)
 
  
