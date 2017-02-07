@@ -4,7 +4,7 @@ from prms_utils import *
 setup_plot_prms()
 
 maxAmp=1.0
-EC50=1e-3
+EC50=2.90e-4
 nH= 1.0
 
 outFiles = "dataGeneratedFromExp.txt"
