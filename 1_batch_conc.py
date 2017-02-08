@@ -15,9 +15,9 @@ import shutil
 
 # Ligand
 
-values = np.logspace(-6,1,2)
+values = np.logspace(-6,1,30)
 
-outDirectory = "DRC_ACh_TEST"
+outDirectory = "TEST_QUEUE"
 
 if(os.path.isdir(outDirectory) != True):
 		os.mkdir(outDirectory)
@@ -61,9 +61,19 @@ for i, iconc in enumerate(values):
 
 	sys.stdout.flush()
 	
+	# for cluster mode
+	fileLaunchBatch = open(outDirectory +os.sep + "launch.sh",'w')
+	fileLaunchBatch.write("#!/usr/bin/env bash \n#Job name \n#SBATCH -J ")
+	fileLaunchBatch.write("Jobs_"+str(i) + " \n")
+	fileLaunchBatch.write("#SBATCH --nodes=1 --ntasks-per-node=1 \n")
+	fileLaunchBatch.write("time python SimulatoreCore.py " + fPRMS) 
+	fileLaunchBatch.close()
 
-	#print "python SimulatoreCore.py "+ str(fPRMS) 
-	os.system("cd "+ outDirectory +os.sep + "; python SimulatoreCore.py "+ fPRMS + " &") 
+	os.system("cd "+ outDirectory +os.sep + "; sbatch launch.sh") 
+	
+	# for single machine
+	# os.system("cd "+ outDirectory +os.sep + "; python SimulatoreCore.py "+ fPRMS + " &") 
+
 	time.sleep(5)
 	print "Simulation #"+ str(i) + " / " + str(maxSimu) + " launched"
 
