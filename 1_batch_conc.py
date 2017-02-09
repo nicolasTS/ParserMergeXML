@@ -15,9 +15,9 @@ import shutil
 
 # Ligand
 
-values = np.logspace(-6,1,30)
+values = np.logspace(-6,1,50)
 
-outDirectory = "TEST_QUEUE"
+outDirectory = "TEST_QUEUE_toto"
 
 if(os.path.isdir(outDirectory) != True):
 		os.mkdir(outDirectory)
@@ -65,7 +65,8 @@ for i, iconc in enumerate(values):
 	fileLaunchBatch = open(outDirectory +os.sep + "launch.sh",'w')
 	fileLaunchBatch.write("#!/usr/bin/env bash \n#Job name \n#SBATCH -J ")
 	fileLaunchBatch.write("Jobs_"+str(i) + " \n")
-	fileLaunchBatch.write("#SBATCH --nodes=1 --ntasks-per-node=1 \n")
+#	fileLaunchBatch.write("#SBATCH --nodes=1 --ntasks-per-node=1 \n")
+	fileLaunchBatch.write("#SBATCH --nodes=1 --ntasks-per-core=1 \n")
 	fileLaunchBatch.write("time python SimulatoreCore.py " + fPRMS) 
 	fileLaunchBatch.close()
 
@@ -74,7 +75,7 @@ for i, iconc in enumerate(values):
 	# for single machine
 	# os.system("cd "+ outDirectory +os.sep + "; python SimulatoreCore.py "+ fPRMS + " &") 
 
-	time.sleep(5)
+	time.sleep(2)
 	print "Simulation #"+ str(i) + " / " + str(maxSimu) + " launched"
 
 sys.exit()
