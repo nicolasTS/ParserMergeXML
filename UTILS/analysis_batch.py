@@ -6,28 +6,48 @@ import datetime
 import glob
 import operator
 import numpy as np
+import pp
+import math, sys, md5, time
+
 
 #################################################
-path = "DRC_ACh"
+path = "TEST_QUEUE_CPU"
 Xfile="ACh"
 Yfile="IP3"
 
 #################################################
 
+
+
+
 valueXfile = []
 valueYfile = []
 
+def maxValue(fileName):
+	""" calcule max value for a txt file """
+	import numpy as np
+	X, Y = np.loadtxt(fileName,unpack=True)
+	maxData = max(Y)
+	return maxData
 
-# recuperation du max pour concentration
-for nameX in glob.glob(path +"/*/" + Xfile +"/Sim0.txt"):
-	X, Y = np.loadtxt(nameX,unpack=True)
-	valueXfile.append(max(Y))
+
+job_server = pp.Server(secret='password')
+
+print "Starting ", job_server.get_ncpus(), " workers"
 
 
-# recuperation du max pour valeur output
-for nameY in glob.glob(path +"/*/" + Yfile +"/Sim0.txt"):
-	X, Y = np.loadtxt(nameY,unpack=True)
-	valueYfile.append(max(Y))
+
+for base in glob.glob(path +"/*/" ):
+
+	nameX = base + Xfile +"/Sim0.txt"
+	a= job_server.submit(maxValue,(nameX, ) )
+	valueXfile.append(a())
+
+	nameY = base + Yfile +"/Sim0.txt"
+	b= job_server.submit(maxValue,(nameY, ) )
+	valueYfile.append(b())
+
+job_server.print_stats()
 
 data = zip(valueXfile, valueYfile)
 
