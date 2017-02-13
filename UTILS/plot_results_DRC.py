@@ -13,25 +13,30 @@ setup_plot_prms()
 
 plt.close("all")
 
-path = "./DRC_ACh/"
-nameOfFiles = "analysisACh_IP3.txt"
+path = "./TEST_QUEUE/"
+tagX = "ACh"
+tagY = "IP3"
+nameOfFiles = "analysis"+tagX+"_"+tagY+".txt"
+#nameOfFiles = "analysisACh_Ga_GTP.txt"
+
 ECICtag = "EC"
 
 
 # nom du graph de sortie
 outName = nameOfFiles[:-4]+"_NORM"
 # titre 
-graphTitle = "Dose Response Curve with 1mM ACh" 
+graphTitle = "" #Dose Response Curve with 1mM ACh" 
 # label
 labelTitle = ""
 
 # X and Y labels
-xAxisLabel ="[ACh] (mM)"
+xAxisLabel ="["+tagX +"] (mM)"
 
-yAxisLabel = '[IP3] norm.'
+yAxisLabel = '['+ tagY+'] norm.'
 
 #yAxisLabel =  r'G$\alpha$qGTP norm.' #r'G$\alpha$qGTP $\mu$m$^2$'
 
+#yAxisLabel =  r'R-ACh binding norm.'
 
 
 
@@ -57,7 +62,8 @@ plt.plot(dataX, dataY, 'o-', color = 'black', label = labelTitle)
 plsq = EC50(dataX, dataY)
 print "EC50 = " +str(plsq[1]) + " nH = " + str(plsq[2])
 
-plt.gca().annotate(ECICtag+"$_{50}= $ " + str('{:.2e}'.format(plsq[1])) + " mM", xy=(plsq[1], min(dataY) + (max(dataY)-min(dataY))/2))
+shift_tag = (plsq[1]*10)/100
+plt.gca().annotate(ECICtag+"$_{50}= $ " + str('{:.2e}'.format(plsq[1])) + " mM", xy=(plsq[1]+shift_tag, min(dataY) + (max(dataY)-min(dataY))/2))
 
 xaline = np.linspace(min(dataX), plsq[1], 10)
 yaline = np.linspace(min(dataY) + (max(dataY)-min(dataY))/2, min(dataY) + (max(dataY)-min(dataY))/2, 10)
