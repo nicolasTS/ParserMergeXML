@@ -568,7 +568,7 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
 	monFichier.write("listOfAssig = " + str(listOfAssig) + "\n")
 	monFichier.write("listOfEvents = " + str(listOfEvents) + "\n\n")
 
-	monFichier.write("writeAllResults("+"simu_params['outDirectory']" +",tsave, nameSaveY  +nameSaveAssig+ nameSaveEvents, listOfY+ listOfAssig + listOfEvents )\n")
+	monFichier.write("writeAllResults("+"simu_params['outDirectory']" +",tsave, nameSaveY  +nameSaveAssig+ nameSaveEvents, listOfY+ listOfAssig + listOfEvents, paramfilepath.rstrip('.py') )\n")
 
 
 
@@ -586,8 +586,10 @@ def writeSaveData(merge_params):
 		monFichier.write("import time \n")
 		monFichier.write("import os \n \n")
 
-		monFichier.write("def writeAllResults(path, tsave,listOfNameSaveY,listOfY): \n")
-		monFichier.write("\t directory = os.sep + time.strftime('Results-%Y-%m-%d_%HH%MM%SS',time.localtime()) \n")
+		monFichier.write("def writeAllResults(path, tsave,listOfNameSaveY,listOfY, tag): \n")
+#		monFichier.write("\t directory = os.sep + time.strftime('Results-%Y-%m-%d_%HH%MM%SS',time.localtime()) \n")
+		monFichier.write("\t directory = os.sep + tag \n")
+
 		monFichier.write("\t tempPath = path + directory \n")
 		monFichier.write("\t os.mkdir(tempPath)	 \n")
 		
