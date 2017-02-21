@@ -11,9 +11,9 @@ import math, sys, md5, time
 
 
 #################################################
-path = "TEST_QUEUE_CPU"
+path = "DRC_ACh"
 Xfile="ACh"
-Yfile="IP3"
+Yfile="Ga_GTP"
 
 #################################################
 
@@ -23,33 +23,56 @@ Yfile="IP3"
 valueXfile = []
 valueYfile = []
 
-def maxValue(fileName):
+def maxValue(fileNameX, fileNameY):
 	""" calcule max value for a txt file """
 	import numpy as np
-	X, Y = np.loadtxt(fileName,unpack=True)
-	maxData = max(Y)
-	return maxData
+	X1, Y1 = np.loadtxt(fileNameX,unpack=True)
+	maxDataX = max(Y1)
+	X2, Y2 = np.loadtxt(fileNameY,unpack=True)
+	maxDataY = max(Y2)
+
+	return maxDataX, maxDataY
 
 
-job_server = pp.Server(secret='password')
 
+
+
+
+ppservers=("*",)
+#ncpus=84	, ppservers=ppservers,
+job_server = pp.Server( ppservers=ppservers, secret='123')
+
+
+ncpus=6
+job_server.set_ncpus(ncpus)
+print job_server.get_active_nodes()
 print "Starting ", job_server.get_ncpus(), " workers"
 
 
 
+jobs = []
+start_time = time.time()
+
+
 for base in glob.glob(path +"/*/" ):
-
 	nameX = base + Xfile +"/Sim0.txt"
-	a= job_server.submit(maxValue,(nameX, ) )
-	valueXfile.append(a())
-
 	nameY = base + Yfile +"/Sim0.txt"
-	b= job_server.submit(maxValue,(nameY, ) )
-	valueYfile.append(b())
+	jobs.append(job_server.submit(maxValue,(nameX,nameY ) ))
 
+
+
+for job in jobs:
+	a, b = job()
+	valueXfile.append(a)
+	valueYfile.append(b)
+
+
+print "Time elapsed: ", time.time() - start_time, "s"
 job_server.print_stats()
 
+
 data = zip(valueXfile, valueYfile)
+
 
 # sort result file
 numberR={}
