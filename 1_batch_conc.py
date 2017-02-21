@@ -9,6 +9,7 @@ import numpy as np
 #from pylab import *
 
 
+
 import re
 import shutil
 
@@ -17,7 +18,7 @@ import shutil
 
 values = np.logspace(-6,1,50)
 
-outDirectory = "TEST_QUEUE_toto"
+outDirectory = "DRC_ACh"
 
 if(os.path.isdir(outDirectory) != True):
 		os.mkdir(outDirectory)
@@ -29,6 +30,8 @@ maxSimu = len(values)
 paramfilepath = sys.argv[1].rstrip(".py")
 exec("from "+paramfilepath+" import *")
 
+basePath = simu_params['outDirectory'] + outDirectory
+
 
 # copy parameters files 
 shutil.copyfile("SimulatoreCore.py", outDirectory + os.sep+ "SimulatoreCore.py")
@@ -38,18 +41,38 @@ shutil.copyfile("SaveData.py", outDirectory + os.sep+ "SaveData.py")
 shutil.copyfile(simu_params['inCsteFile'], outDirectory + os.sep+ simu_params['inCsteFile'])
 
 
-#'inCsteFile' : "./Cstes.txt",
-#os.system("cd "+ outDirectory +os.sep)
+starterBatch = open(outDirectory +os.sep + "start_All_launch.sh",'a')
 
- 
+
+"""
+# for cluster mode
+fileLaunchBatch = open(outDirectory +os.sep + "launch_00.sh",'w')
+fileLaunchBatch.write("#!/usr/bin/env bash \n#Job name \n#SBATCH -J ")
+fileLaunchBatch.write("Jobs_00" + " \n")
+fileLaunchBatch.write("#SBATCH --ntasks-per-core=1 \n")
+fileLaunchBatch.write("#SBATCH --mem=500 \n")
+fileLaunchBatch.write("scontrol show jobid -dd ${SLURM_JOBID} \n")
+fileLaunchBatch.write("time echo $HOSTNAME  sleep 10") 
+fileLaunchBatch.close()
+
+starterBatch.write("sbatch "+ "launch_00.sh"+" \n")
+starterBatch.write("sleep 1 \n")
+"""
+
+
+
+
 for i, iconc in enumerate(values):
 
 
-	simu_params['valuePulse'] = [iconc,0, 0, 0, 0, 0]
+
+	simu_params['valuePulse'] = [0,0, iconc, 0, 0, 0]
+
+	simu_params['outDirectory'] = basePath
 
 	#ecriture du fichier 
 	fPRMS = paramfilepath + "_"+ str(i) + ".py"
-	print fPRMS
+	print fPRMS + " with value = " + str(iconc)
  	
 
 	f = open(outDirectory +os.sep + fPRMS,'w')
@@ -58,24 +81,39 @@ for i, iconc in enumerate(values):
 	f.write("simu_params = " +str(simu_params))
 	f.close()
 	
+	print outDirectory
 
 	sys.stdout.flush()
 	
 	# for cluster mode
-	fileLaunchBatch = open(outDirectory +os.sep + "launch.sh",'w')
+	fileLaunchBatch = open(outDirectory +os.sep + "launch_"+str(i)+".sh",'w')
 	fileLaunchBatch.write("#!/usr/bin/env bash \n#Job name \n#SBATCH -J ")
 	fileLaunchBatch.write("Jobs_"+str(i) + " \n")
-#	fileLaunchBatch.write("#SBATCH --nodes=1 --ntasks-per-node=1 \n")
-	fileLaunchBatch.write("#SBATCH --nodes=1 --ntasks-per-core=1 \n")
+	fileLaunchBatch.write("#SBATCH --ntasks-per-core=1 \n")
+	fileLaunchBatch.write("#SBATCH --mem=5000 \n")
+
+	fileLaunchBatch.write("echo 'LOCALID = ' $SLURM_LOCALID \n")
+	fileLaunchBatch.write("echo 'PROCID = ' $SLURM_PROCID \n")
+
+#	fileLaunchBatch.write("#SBATCH --nodes=1 --ntasks-per-core=1 \n")
+#	fileLaunchBatch.write("#SBATCH -o slurm." + str(i) + ".out \n")
+#	fileLaunchBatch.write("#SBATCH -e slurm." + str(i) + ".err \n")
+
+	fileLaunchBatch.write("scontrol show jobid -dd ${SLURM_JOBID} \n")
 	fileLaunchBatch.write("time python SimulatoreCore.py " + fPRMS) 
 	fileLaunchBatch.close()
 
-	os.system("cd "+ outDirectory +os.sep + "; sbatch launch.sh") 
+
+	starterBatch.write("sbatch "+ "launch_"+str(i)+".sh"+" \n")
+	starterBatch.write("sleep 1 \n")
+
+
+	#os.system("cd "+ outDirectory +os.sep + "; sbatch launch_"+str(i)+".sh") 
 	
 	# for single machine
 	# os.system("cd "+ outDirectory +os.sep + "; python SimulatoreCore.py "+ fPRMS + " &") 
 
-	time.sleep(2)
+	#time.sleep(2)
 	print "Simulation #"+ str(i) + " / " + str(maxSimu) + " launched"
 
 sys.exit()
