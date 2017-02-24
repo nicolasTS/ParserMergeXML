@@ -16,9 +16,9 @@ import shutil
 
 # Ligand
 
-values = np.logspace(-6,1,20)
+values = np.logspace(-6,0,20)
 
-outDirectory = "DRC_ACh"
+outDirectory = "DRC_ACh_v2"
 
 if(os.path.isdir(outDirectory) != True):
 		os.mkdir(outDirectory)
@@ -74,7 +74,7 @@ for i, iconc in enumerate(values):
 
 
 
-	simu_params['valuePulse'] = [0,0, iconc, 0, 0, 0]
+	simu_params['valuePulse'] = [iconc,0, 0, 0, 0, 0]
 
 	simu_params['outDirectory'] = basePath
 
@@ -109,9 +109,9 @@ for i, iconc in enumerate(values):
 	fileLaunchBatch.write("Jobs_"+str(i) + " \n")
 	fileLaunchBatch.write("#SBATCH --mem-per-cpu=5000 \n")
 	fileLaunchBatch.write("#SBATCH --ntasks 1 \n")
-	fileLaunchBatch.write("#SBATCH --ntasks-per-core=1 \n")
+#	fileLaunchBatch.write("#SBATCH --ntasks-per-core=1 \n")
 
-	fileLaunchBatch.write("#SBATCH --exclusive \n")
+#	fileLaunchBatch.write("#SBATCH --exclusive \n")
 	fileLaunchBatch.write("#SBATCH --time=1 \n")
 
 #SBATCH --qos=lowpri
@@ -128,10 +128,11 @@ for i, iconc in enumerate(values):
 	fileLaunchBatch.write("srun python SimulatoreCore_"+str(i)+".py " + fPRMS) 
 	fileLaunchBatch.close()
 
-	#os.system("cd "+ outDirectory +os.sep + "; sbatch launch_"+str(i)+".sh")
+	os.system("cd "+ outDirectory +os.sep + "; sbatch launch_"+str(i)+".sh")
+	time.sleep(2)
 
 	starterBatch.write("sbatch "+ "launch_"+str(i)+".sh"+" \n")
-	starterBatch.write("sleep 3 \n")
+	starterBatch.write("sleep 2 \n")
 
 
 	#os.system("cd "+ outDirectory +os.sep + "; sbatch launch_"+str(i)+".sh") 
