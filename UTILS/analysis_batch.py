@@ -11,10 +11,10 @@ import math, sys, md5, time
 
 
 #################################################
-path = "DRC_ACh"
+path = "DRC_ACh_50pts"
 Xfile="ACh"
-Yfile="Ga_GTP"
-
+Yfile="readout_RACh"
+ncpus=int(sys.argv[1])
 #################################################
 
 
@@ -43,7 +43,7 @@ ppservers=("*",)
 job_server = pp.Server( ppservers=ppservers, secret='123')
 
 
-ncpus=6
+
 job_server.set_ncpus(ncpus)
 print job_server.get_active_nodes()
 print "Starting ", job_server.get_ncpus(), " workers"
