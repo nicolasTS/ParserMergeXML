@@ -433,6 +433,9 @@ def writeSimulatorCore(listeModels, merge_params, simu_params):
         monFichier.write("except ImportError:\n")
         monFichier.write("\timport cvode\n\n")
         monFichier.write("import ctypes\n")
+	#evite les pbs avec matplotlibrc
+	monFichier.write("import matplotlib\n")
+	monFichier.write("matplotlib.use('agg') \n")
         monFichier.write("import numpy as np  # NumPy (multidimensional arrays, linear algebra, ...)\n")
         monFichier.write("import scipy as sp  # SciPy (signal and image processing library)\n")
         monFichier.write("import matplotlib.pyplot as plt  # Matplotlib's pyplot: MATLAB-like syntax\n")
