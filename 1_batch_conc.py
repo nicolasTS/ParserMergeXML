@@ -16,9 +16,9 @@ import shutil
 
 # Ligand
 
-values = np.logspace(-6,0,20)
+values = np.logspace(-6,0,50)
 
-outDirectory = "DRC_ACh_v2"
+outDirectory = "DRC_ACh_TEST"
 
 if(os.path.isdir(outDirectory) != True):
 		os.mkdir(outDirectory)
@@ -50,11 +50,11 @@ fileLaunchBatch = open(outDirectory +os.sep + "launch_00.sh",'w')
 fileLaunchBatch.write("#!/usr/bin/env bash \n#Job name \n#SBATCH -J ")
 fileLaunchBatch.write("Jobs_00" + " \n")
 
-fileLaunchBatch.write("#SBATCH --mem-per-cpu=5000 \n")
+fileLaunchBatch.write("#SBATCH --mem-per-cpu=500 \n")
 fileLaunchBatch.write("#SBATCH --ntasks 1 \n")
 fileLaunchBatch.write("#SBATCH --ntasks-per-core=1 \n")
 
-fileLaunchBatch.write("#SBATCH --exclusive \n")
+#fileLaunchBatch.write("#SBATCH --exclusive \n")
 fileLaunchBatch.write("#SBATCH --time=1 \n")
 fileLaunchBatch.write("scontrol show jobid -dd ${SLURM_JOBID} \n")
 fileLaunchBatch.write("srun sleep 10") 
@@ -74,7 +74,7 @@ for i, iconc in enumerate(values):
 
 
 
-	simu_params['valuePulse'] = [iconc,0, 0, 0, 0, 0]
+	simu_params['valuePulse'] = [0,0, iconc, 0, 0, 0]
 
 	simu_params['outDirectory'] = basePath
 
@@ -107,12 +107,12 @@ for i, iconc in enumerate(values):
 	fileLaunchBatch = open(outDirectory +os.sep + "launch_"+str(i)+".sh",'w')
 	fileLaunchBatch.write("#!/usr/bin/env bash \n#Job name \n#SBATCH -J ")
 	fileLaunchBatch.write("Jobs_"+str(i) + " \n")
-	fileLaunchBatch.write("#SBATCH --mem-per-cpu=5000 \n")
+	fileLaunchBatch.write("#SBATCH --mem-per-cpu=500 \n")
 	fileLaunchBatch.write("#SBATCH --ntasks 1 \n")
 #	fileLaunchBatch.write("#SBATCH --ntasks-per-core=1 \n")
 
 #	fileLaunchBatch.write("#SBATCH --exclusive \n")
-	fileLaunchBatch.write("#SBATCH --time=1 \n")
+	fileLaunchBatch.write("#SBATCH --time=3 \n")
 
 #SBATCH --qos=lowpri
 #	fileLaunchBatch.write("#SBATCH --ntasks-per-core=1 \n")
@@ -134,8 +134,6 @@ for i, iconc in enumerate(values):
 	starterBatch.write("sbatch "+ "launch_"+str(i)+".sh"+" \n")
 	starterBatch.write("sleep 2 \n")
 
-
-	#os.system("cd "+ outDirectory +os.sep + "; sbatch launch_"+str(i)+".sh") 
 	
 	# for single machine
 	# os.system("cd "+ outDirectory +os.sep + "; python SimulatoreCore.py "+ fPRMS + " &") 
