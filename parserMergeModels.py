@@ -322,9 +322,14 @@ def writeODESystem(listeModels, merge_params, simu_params):
 	for (k, v) in zip(listeNamesKineticsParameters, listeValuesKineticsParameters):
 		f.write(str(k) + "= " + str(v) + "\n")
 
-	monFichier.write("for i, line in enumerate(file(simu_params['inCsteFile'], 'r' )):\n")
-	monFichier.write("\t(a,b)=line.split(' = ')\n")
-	monFichier.write("\tconstants[i] = float(b)\n")
+#	monFichier.write("for i, line in enumerate(file(simu_params['inCsteFile'], 'r' )):\n")
+	monFichier.write("i=0 \n")
+	monFichier.write("for line in file(simu_params['inCsteFile'], 'r' ):\n")
+	monFichier.write("\tif not line.startswith('#'):\n")
+	monFichier.write("\t\t(a,b)=line.split(' = ')\n")
+	monFichier.write("\t\tconstants[i] = float(b)\n")
+	monFichier.write("\t\ti+=1\n")
+
 
 
  	monFichier.write("\n\n\n# SPECIES: INITIAL CONDITION\n")
@@ -632,9 +637,10 @@ listeModels = []
 document1 = readSBML(merge_params['listXMLFiles'][0]);
 listeModels.append(document1.getModel());
 
+"""
 document2 = readSBML(merge_params['listXMLFiles'][1]);
 listeModels.append(document2.getModel());
-
+"""
 
 print "List of XML files: "
 print listeModels
