@@ -22,30 +22,21 @@ exec("from "+paramfilepath+" import *")
 namePRMS = sys.argv[2] #"kf_G1"
 valuePRMS = float(sys.argv[3]) #2.7e-07
 
-perCent = 100
-nbPoints = 10
 values = []
 
-"""
-for a in range(100,0,-step):
-	values.append(valuePRMS - valuePRMS*(a/100.0))
+# variation du prm cinetique 
 
-for b in range(0,100,step):
-	values.append(valuePRMS + valuePRMS*(b/100.0))
-"""
-
-#print values
-tmpInter = np.linspace(valuePRMS/perCent,valuePRMS*perCent,nbPoints)
+#tmpInter = np.linspace(valuePRMS/perCent,valuePRMS*perCent,nbPoints)
+#tmpInter = np.linspace(1e-6,1e0, 40)
+tmpInter = np.logspace(-4,4,40)
 
 for ivalue in tmpInter:
 	values.append(ivalue)
 
 values.append(valuePRMS)
 
-#print values
+print values
 
-
-#sys.exit()
 
 outDirectory = "batch_"+namePRMS
 
@@ -53,7 +44,6 @@ if(os.path.isdir(outDirectory) != True):
 		os.mkdir(outDirectory)
 
 maxSimu = len(values)
-
 
 
 # copy parameters files 
@@ -68,7 +58,9 @@ dd = simu_params['outDirectory']
 
 for i, iconc in enumerate(values):
 
-	finalDirectory = outDirectory +os.sep +dd+namePRMS+"_"+ str(i)
+	finalDirectory = dd+outDirectory+os.sep +namePRMS+"_"+ str(i)
+
+	print finalDirectory
 
 	fCSTES = ff[:-4] + "_"+ str(i) + ".txt"
 
@@ -83,8 +75,12 @@ for i, iconc in enumerate(values):
 		f.write(str(a) +" = " + str(b))
 
 	simu_params['inCsteFile'] = fCSTES
-	simu_params['outDirectory'] = dd+namePRMS+"_"+ str(i)
+	simu_params['outDirectory'] = dd+outDirectory+os.sep +namePRMS+"_"+ str(i)
 	os.mkdir(finalDirectory )
+
+
+
+
 
 	#ecriture du fichier 
 	fPRMS = paramfilepath + "_"+ str(i) + ".py"
@@ -98,13 +94,14 @@ for i, iconc in enumerate(values):
 
 	sys.stdout.flush()
 	
-
+	
 	#print "python SimulatoreCore.py "+ str(fPRMS) 
 	os.system("cd "+ outDirectory +os.sep + "; python SimulatoreCore.py "+ fPRMS + " &") 
-	time.sleep(5)
+	time.sleep(3)
 	shutil.move(outDirectory +os.sep +fCSTES, finalDirectory + os.sep+ fCSTES)
 	shutil.move(outDirectory +os.sep +fPRMS, finalDirectory + os.sep+ fPRMS)
-
+	
+	
 	print "Simulation #"+ str(i) + " / " + str(maxSimu) + " launched"
 
 sys.exit()
