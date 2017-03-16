@@ -22,20 +22,22 @@ exec("from "+paramfilepath+" import *")
 namePRMS = sys.argv[2] #"kf_G1"
 valuePRMS = float(sys.argv[3]) #2.7e-07
 
-values = []
-
 # variation du prm cinetique 
 
 #tmpInter = np.linspace(valuePRMS/perCent,valuePRMS*perCent,nbPoints)
 #tmpInter = np.linspace(1e-6,1e0, 40)
-tmpInter = np.logspace(-4,2,10)
+tmpInter = np.logspace(-3,3,40)
+
+valuesDRC = np.logspace(-3,2,20)
+
+#######################################################################################################################
+values = []
 
 for ivalue in tmpInter:
 	values.append(ivalue)
 
 values.append(valuePRMS)
 
-print values
 
 
 outDirectory = "batch_"+namePRMS
@@ -45,7 +47,6 @@ if(os.path.isdir(outDirectory) != True):
 
 
 
-valuesDRC = np.logspace(-3,2,10)
 
 outDirectoryDRC = "DRC_Glu"
 
@@ -66,7 +67,7 @@ for i, iconc in enumerate(values):
 
 	finalDirectory = dd+outDirectory+os.sep +namePRMS+"_"+ str(i)
 
-	print finalDirectory
+	#print finalDirectory
 
 	fCSTES = ff[:-4] + "_"+ str(i) + ".txt"
 
@@ -118,7 +119,7 @@ for i, iconc in enumerate(values):
 		simu_params['outDirectory'] = basePath
 		#ecriture du fichier 
 		fPRMS = paramfilepath + "_"+ str(iDRC) + ".py"
-		print fPRMS + " with value = " + str(iconcDRC)
+		#print fPRMS + " with value = " + str(iconcDRC)
  	
 
 		f = open(basePath +os.sep + fPRMS,'w')
