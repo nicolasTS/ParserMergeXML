@@ -19,9 +19,9 @@ from prms_utils import *
 
 setup_plot_prms()
 
-tag = "ACh_L_IP3"
-path ="DRC_ACh_L/"
-files = "analysisACh_L_Ga_GTP.txt"
+
+path ="batch_kass_re16"
+files = "analysis_PRMS_Glu_sumOpen.txt"
 
 
 outName = files[:-4]
@@ -29,16 +29,16 @@ outName = files[:-4]
 graphTitle ="" #"with [ACh] = 10 mM"
 
 # X and Y labels
-xAxisLabel ="[ACh] (mM)"
-yAxisLabel = "[L] (mM)"
-zAxisLabel = r'G$\alpha$qGTP norm'
+xAxisLabel = "PRMS"
+yAxisLabel = "[Glu] (mM)"
+zAxisLabel = "sumOpen"
 
-data = np.loadtxt(path + files)
+x, y , z = np.loadtxt(path + os.sep +  files,unpack=True)
 
 
-x = data[:,0]
-y = data[:,1]
-z = data[:,2] /max(data[:,2])
+#x = data[:,0]
+#y = data[:,1]
+#z = data[:,2] /max(data[:,2])
 
 
 
@@ -52,8 +52,8 @@ z = data[:,2] /max(data[:,2])
 
 
 #Through the unstructured data get the structured data by interpolation
-xi = np.logspace(-6,1,2000) #np.linspace(x.min(), x.max(), 200)
-yi = np.logspace(-6,1,2000) #np.linspace(y.min(), y.max(),  200)
+xi = np.logspace(-3,3,200) #np.linspace(x.min(), x.max(), 200)
+yi = np.logspace(-3,2,200) #np.linspace(y.min(), y.max(),  200)
 zi = griddata(x, y, z, xi,yi, interp='linear') #interp='nn')
 
 
@@ -65,6 +65,9 @@ plt.suptitle(graphTitle)
 
 CS = plt.contour(xi,yi,zi,10,linewidths=1,colors='black')
 CS = plt.contourf(xi,yi,zi,10,cmap=plt.cm.jet,  vmax=abs(zi).max(), vmin=-abs(zi).max()) 
+refX = 0.55
+refY = 0.486434368805
+plt.plot(refX, refY, marker = 'x', markersize =20, markeredgewidth = 5,  color = 'red', label= "Initial value " + str(refX))
 
 cbar = plt.colorbar(CS)
 
