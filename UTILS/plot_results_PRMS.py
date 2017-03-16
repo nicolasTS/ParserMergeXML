@@ -17,7 +17,7 @@ namePRMS = sys.argv[1] # "kf_G1"
 out = "Ga_GTP"
 out2 = "IP3"
 
-refCsteFile="Cstes_CHO.txt"
+refCsteFile="Cstes.txt"
 
 path = "./batch_"+namePRMS +"/"
 nameOfFiles = "analysis"+namePRMS+"_"+out+".txt"
@@ -83,22 +83,34 @@ Fig = plt.figure(num=None)
 # titre du graph
 plt.suptitle(graphTitle)
 
-
+"""
 plt.plot(dataX, dataY/max(dataY), 'o-', color = 'black',  label = out)
 plt.plot(refX, refY/max(dataY), marker = 'x', markersize =20, markeredgewidth = 5,  color = 'red', label= "Initial value " + str(refX))
 
 plt.plot(dataX2, dataY2/max(dataY2), 'o-', color = 'green', label = out2)
 plt.plot(refX, refY2/max(dataY2), marker = 'x', markersize =20, markeredgewidth = 5,  color = 'red')
+"""
 
+
+plt.subplot(211)
+plt.plot(dataX, dataY/refY, 'o-', color = 'black',  label = out)
+plt.plot(refX, refY/refY, marker = 'x', markersize =20, markeredgewidth = 5,  color = 'red', label= "Initial value " + str(refX))
+plt.legend(loc = 'lower right')
+plt.ylabel("Norm by init value")
+drop_spines(plt.gca())
+
+plt.subplot(212)
+plt.plot(dataX2, dataY2/refY2, 'o-', color = 'green', label = out2)
+plt.plot(refX, refY2/refY2, marker = 'x', markersize =20, markeredgewidth = 5,  color = 'red')
 
 plt.legend(loc = 'lower right')
-
+plt.ylabel("Norm by init value")
 # label X
 plt.xlabel(xAxisLabel)
 
 
 # label pour axe Y
-plt.ylabel(yAxisLabel)
+plt.ylabel("Norm by ref value")
 
 drop_spines(plt.gca())
 
