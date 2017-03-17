@@ -19,46 +19,44 @@ from prms_utils import *
 
 setup_plot_prms()
 
+###############################################################################################################
 
-path ="batch_kass_re16"
+path ="batch_kass_re1"
 files = "analysis_PRMS_Glu_sumOpen.txt"
 
+# valeurs de ref PRMS / output
+refX = 10.0
+refY = 0.486434368805
 
-outName = files[:-4]
-
-graphTitle ="" #"with [ACh] = 10 mM"
+# range PRMS et GLU utilse pour faire les simu
+xi = np.logspace(-3,4,200) #np.linspace(x.min(), x.max(), 200)
+yi = np.logspace(-3,3,200) #np.linspace(y.min(), y.max(),  200)
 
 # X and Y labels
 xAxisLabel = "PRMS"
 yAxisLabel = "[Glu] (mM)"
 zAxisLabel = "sumOpen"
 
-# valeurs de ref PRMS / output
-refX = 0.55
-refY = 0.486434368805
+###############################################################################################################
 
+
+outName = files[:-4]
+
+graphTitle ="" #"with [ACh] = 10 mM"
 
 x, y , z = np.loadtxt(path + os.sep +  files,unpack=True)
-
-
-#x = data[:,0]
-#y = data[:,1]
-#z = data[:,2] /max(data[:,2])
-
-
-
-
-
 
 ###############################################################################################################
 # contour
 ###
 
-
-
-#Through the unstructured data get the structured data by interpolation
+"""
+# range PRMS et GLU utilse pour faire les simu
 xi = np.logspace(-3,3,200) #np.linspace(x.min(), x.max(), 200)
 yi = np.logspace(-3,2,200) #np.linspace(y.min(), y.max(),  200)
+"""
+
+#Through the unstructured data get the structured data by interpolation
 zi = griddata(x, y, z, xi,yi, interp='linear') #interp='nn')
 
 
