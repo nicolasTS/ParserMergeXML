@@ -26,7 +26,7 @@ files = "analysis_PRMS_Glu_sumOpen.txt"
 
 # valeurs de ref PRMS / output
 refX = 10.0
-refY = 0.486434368805
+#refY = 0.486434368805
 
 # range PRMS et GLU utilse pour faire les simu
 xi = np.logspace(-3,4,200) #np.linspace(x.min(), x.max(), 200)
@@ -35,7 +35,7 @@ yi = np.logspace(-3,3,200) #np.linspace(y.min(), y.max(),  200)
 # X and Y labels
 xAxisLabel = "PRMS"
 yAxisLabel = "[Glu] (mM)"
-zAxisLabel = "sumOpen"
+zAxisLabel = "Peak sumOpen"
 
 ###############################################################################################################
 
@@ -65,11 +65,23 @@ ax = fig.gca()
 
 plt.suptitle(graphTitle)
 
-
+"""
 CS = plt.contour(xi,yi,zi,10,linewidths=1,colors='black')
 CS = plt.contourf(xi,yi,zi,10,cmap=plt.cm.jet,  vmax=abs(zi).max(), vmin=-abs(zi).max()) 
 
-plt.plot(refX, refY, marker = 'x', markersize =20, markeredgewidth = 5,  color = 'red', label= "Initial value " + str(refX))
+plt.plot(refX, refY, marker = 'x', markersize =20, markeredgewidth = 5,  color = 'black', label= "Initial value " + str(refX))
+"""
+CS = plt.contour(yi,xi,zi,10,linewidths=1,colors='black')
+CS = plt.contourf(yi,xi,zi,10,cmap=plt.cm.jet,  vmax=abs(zi).max(), vmin=-abs(zi).max()) 
+
+min(yi)
+
+xaline = np.linspace(min(yi), max(yi), 10)
+yaline = np.linspace(refX, refX, 10) 
+plt.plot(xaline, yaline, lw = 5,  color = 'black')
+
+#plt.plot(refY, refX, marker = 'x', markersize =20, markeredgewidth = 5,  color = 'black', label= "Initial value " + str(refX))
+
 
 cbar = plt.colorbar(CS)
 
@@ -81,8 +93,8 @@ drop_spines(plt.gca())
 
 
 
-ax.set_xlabel(xAxisLabel) 
-ax.set_ylabel(yAxisLabel)
+ax.set_xlabel(yAxisLabel) 
+ax.set_ylabel(xAxisLabel)
 cbar.ax.set_ylabel(zAxisLabel)
 
 
