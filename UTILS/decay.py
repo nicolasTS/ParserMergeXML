@@ -50,11 +50,12 @@ def residuals(p,data,t):
 p0 = [peak,max(dataX)] # initial guesses
 
 pbest = leastsq(residuals,p0,args=(dataYcut,dataXcut),full_output=1)
-print 'Decay time with mono exp ',pbest[0][1]
+print 'Decay time fit with mono exp ',pbest[0][1]
 
 print 'AUC ',auc
+print "Peak " , peak
 
-graphTitle ="Decay time of " + str(round(pbest[0][1], 2)) + " with mono exp \n AUC of " + str(round(auc, 2))
+graphTitle ="Decay time of " + str(round(pbest[0][1], 2)) + " fit with mono exp \n AUC of " + str(round(auc, 2)) + "\nPeak " + str(round(peak,2))
 
 Fig = plt.figure(num=None)
 
