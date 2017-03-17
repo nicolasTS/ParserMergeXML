@@ -20,7 +20,7 @@ fileName = sys.argv[1]
 
 # X and Y labels
 xAxisLabel ="Time (msec)"
-yAxisLabel = r'G$\alpha$qGTP $\mu$m$^2$'
+yAxisLabel = "sumOpen" #"r'G$\alpha$qGTP $\mu$m$^2$'
 
 #########################################################################################
 
@@ -32,6 +32,8 @@ dataX, dataY = np.loadtxt(fileName, unpack= True)
 
 peak = max(dataY)
 timeForPeak = np.argmax(dataY)
+
+auc=np.trapz(dataY,dataX)
 
 
 dataXcut=dataX[timeForPeak:]
@@ -50,7 +52,9 @@ p0 = [peak,max(dataX)] # initial guesses
 pbest = leastsq(residuals,p0,args=(dataYcut,dataXcut),full_output=1)
 print 'Decay time with mono exp ',pbest[0][1]
 
-graphTitle ="Decay time of " + str(round(pbest[0][1], 2)) + "with mono exp"
+print 'AUC ',auc
+
+graphTitle ="Decay time of " + str(round(pbest[0][1], 2)) + " with mono exp \n AUC of " + str(round(auc, 2))
 
 Fig = plt.figure(num=None)
 
@@ -64,6 +68,8 @@ x = np.linspace(dataX[timeForPeak], max(dataX), 100)
 f =  expl(x,pbest[0])
 
 plt.plot(x, f ,color = 'red', lw = 4, label ="fit")
+
+plt.ylim(0,max(dataY))
 
 plt.legend()
 
