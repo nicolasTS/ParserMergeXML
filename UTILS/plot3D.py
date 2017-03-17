@@ -33,6 +33,11 @@ xAxisLabel = "PRMS"
 yAxisLabel = "[Glu] (mM)"
 zAxisLabel = "sumOpen"
 
+# valeurs de ref PRMS / output
+refX = 0.55
+refY = 0.486434368805
+
+
 x, y , z = np.loadtxt(path + os.sep +  files,unpack=True)
 
 
@@ -65,8 +70,7 @@ plt.suptitle(graphTitle)
 
 CS = plt.contour(xi,yi,zi,10,linewidths=1,colors='black')
 CS = plt.contourf(xi,yi,zi,10,cmap=plt.cm.jet,  vmax=abs(zi).max(), vmin=-abs(zi).max()) 
-refX = 0.55
-refY = 0.486434368805
+
 plt.plot(refX, refY, marker = 'x', markersize =20, markeredgewidth = 5,  color = 'red', label= "Initial value " + str(refX))
 
 cbar = plt.colorbar(CS)
