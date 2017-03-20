@@ -169,4 +169,12 @@ def EC50(dataX, dataY):
 	
 	return plsq
 
+##############################################################################################################################
 
+def expl(t,p):
+	return(p[0]*exp(-t/p[1]))
+	    
+def residuals(p,data,t):
+	err = data - expl(t,p)
+	return err
+	    
