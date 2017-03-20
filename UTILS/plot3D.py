@@ -21,30 +21,42 @@ setup_plot_prms()
 
 ###############################################################################################################
 
-path ="batch_kass_re1"
+path ="batch_kass_re16"
 files = "analysis_PRMS_Glu_sumOpen.txt"
 
 # valeurs de ref PRMS / output
-refX = 10.0
+refX = 0.55
 #refY = 0.486434368805
 
 # range PRMS et GLU utilse pour faire les simu
 xi = np.logspace(-3,4,200) #np.linspace(x.min(), x.max(), 200)
 yi = np.logspace(-3,3,200) #np.linspace(y.min(), y.max(),  200)
 
+# a = peak b = 	auc, c = decay
+colDataToPlot = "decay"
+
+
 # X and Y labels
 xAxisLabel = "PRMS"
 yAxisLabel = "[Glu] (mM)"
-zAxisLabel = "Peak sumOpen"
+zAxisLabel = "decay" #Peak sumOpen"
 
 ###############################################################################################################
 
 
-outName = files[:-4]
+outName = files[:-4] + '_' +colDataToPlot
 
 graphTitle ="" #"with [ACh] = 10 mM"
 
-x, y , z = np.loadtxt(path + os.sep +  files,unpack=True)
+x, y , a, b, c = np.loadtxt(path + os.sep +  files,unpack=True)
+
+if (colDataToPlot == "peak"):
+	print colDataToPlot
+	z= a 
+if (colDataToPlot == "auc"):
+	z = b
+if (colDataToPlot == "decay"):
+	z = c
 
 ###############################################################################################################
 # contour
@@ -74,7 +86,6 @@ plt.plot(refX, refY, marker = 'x', markersize =20, markeredgewidth = 5,  color =
 CS = plt.contour(yi,xi,zi,10,linewidths=1,colors='black')
 CS = plt.contourf(yi,xi,zi,10,cmap=plt.cm.jet,  vmax=abs(zi).max(), vmin=-abs(zi).max()) 
 
-min(yi)
 
 xaline = np.linspace(min(yi), max(yi), 10)
 yaline = np.linspace(refX, refX, 10) 
@@ -86,7 +97,7 @@ plt.plot(xaline, yaline, lw = 5,  color = 'black')
 cbar = plt.colorbar(CS)
 
 
-#CS.set_clim(0, 1.0)
+#CS.set_clim(0, 0.1)
 
 drop_spines(plt.gca())
 
