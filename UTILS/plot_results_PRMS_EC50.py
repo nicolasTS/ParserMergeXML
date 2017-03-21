@@ -25,7 +25,7 @@ NbPrmsUsed = 40
 #lire ligne 2 et compter le nombre d occurence dans le fichier
 
 # PRMS d origine et EC50 d orgine
-refX = 10.0
+refX = 10.0 #0.55 #10.0
 refY = 3.53e-1
 
 ###############################################################################################################################
@@ -50,7 +50,7 @@ yAxisLabel = '['+ tagY+'] '
 
 EC50s = []
 prms =[]
-x, y , z = np.loadtxt(path + os.sep +  nameOfFiles,unpack=True)
+x, y , z , z2, z3= np.loadtxt(path + os.sep +  nameOfFiles,unpack=True)
 
 for i in range(0,len(x), NbPrmsUsed):		
 	a = []
