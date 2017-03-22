@@ -13,10 +13,10 @@ import math, sys, md5, time
 
 
 #################################################
-path = "batch_kass_re16"
+path = "batch_kass_re19"
 Xfile="Glu"
 Yfile="sumOpen"
-namePRMS = "kass_re16"
+namePRMS = "kass_re19"
 cstesBase = "Cstes"
 ncpus=int(4)
 #################################################
@@ -34,6 +34,9 @@ def maxValue3D(fileCste, namePRMS, fileNameX, fileNameY):
 	""" calcule max value for a txt file """
 	import numpy as np
 	from prms_utils import *
+	
+	#from scipy.optimize import curve_fit
+
 	for line in file(fileCste, 'r' ):
 		if not line.startswith('#'):
 			(a,b)=line.split(' = ')
@@ -49,12 +52,16 @@ def maxValue3D(fileCste, namePRMS, fileNameX, fileNameY):
 
 	timeForPeak = np.argmax(Y2)
 	dataXcut=X2[timeForPeak:]
-	dataYcut=Y2[timeForPeak:]	    
-	p0 = [maxDataY,max(X2)] # initial guesses
-	pbest = leastsq(residuals,p0,args=(dataYcut,dataXcut),full_output=1)
+	dataYcut=Y2[timeForPeak:]
+
+	popt, pcov = curve_fit(func, dataXcut, dataYcut, [maxDataY,max(X2)])
+	decay = popt[1]
+	#p0 = [maxDataY,max(X2)] # initial guesses
+	#pbest = leastsq(residuals,p0,args=(dataYcut,dataXcut),full_output=1)
 	#print 'Decay time fit with mono exp ',pbest[0][1]
-	decay = pbest[0][1]
+	#decay = pbest[0][1]
 	
+
 	return valuePrm, maxDataX, maxDataY, auc, decay
 
 
