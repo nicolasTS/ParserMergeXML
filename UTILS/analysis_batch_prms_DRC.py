@@ -13,10 +13,10 @@ import math, sys, md5, time
 
 
 #################################################
-path = "batch_kass_re19"
+path = "batch_kass_re1"
 Xfile="Glu"
 Yfile="sumOpen"
-namePRMS = "kass_re19"
+namePRMS = "kass_re1"
 cstesBase = "Cstes"
 ncpus=int(4)
 #################################################
@@ -53,9 +53,14 @@ def maxValue3D(fileCste, namePRMS, fileNameX, fileNameY):
 	timeForPeak = np.argmax(Y2)
 	dataXcut=X2[timeForPeak:]
 	dataYcut=Y2[timeForPeak:]
+	try: 
+		#popt, pcov = curve_fit(func, dataXcut, dataYcut, [maxDataY,max(X2)], maxfev = 100000)
+		popt, pcov = curve_fit(func2, dataXcut, dataYcut, [maxDataY,max(X2), maxDataY,max(X2)], maxfev = 100000)
 
-	popt, pcov = curve_fit(func, dataXcut, dataYcut, [maxDataY,max(X2)])
-	decay = popt[1]
+		decay = popt[1]
+	except:
+		print "no Fit with mono exp "
+		decay = 666
 	#p0 = [maxDataY,max(X2)] # initial guesses
 	#pbest = leastsq(residuals,p0,args=(dataYcut,dataXcut),full_output=1)
 	#print 'Decay time fit with mono exp ',pbest[0][1]
@@ -117,6 +122,7 @@ job_server.print_stats()
 data = zip(valuePRMfile, valueXfile, valueYfile, valueYfileAUC, valueYfileDecay)
 
 
+
 # sort result file
 numberR={}
 for i in range(len(data)):
@@ -129,8 +135,10 @@ lsrt= sorted(numberR.iteritems(), key=operator.itemgetter(1))
 
 sortFile = file(path + "/analysis_PRMS_" + Xfile + "_" + Yfile + ".txt", 'a')
 print>>sortFile, "#  "+str(namePRMS) + " "+ str(Xfile) + "   " +str(Yfile) + str("AUC  Decay")
-for ivalue in lsrt: 
-	print>>sortFile, str(ivalue[1][0]) + " " +str(ivalue[1][1])+ " " +str(ivalue[1][2])+" " +str(ivalue[1][3])+" " +str(ivalue[1][4])
+for ivalue in lsrt:
+	# pour enlever les cas ou pas possible de faire un fit
+	if (ivalue[1][4] != 666.0):
+		print>>sortFile, str(ivalue[1][0]) + " " +str(ivalue[1][1])+ " " +str(ivalue[1][2])+" " +str(ivalue[1][3])+" " +str(ivalue[1][4])
 
 
  

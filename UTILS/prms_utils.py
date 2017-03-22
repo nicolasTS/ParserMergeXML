@@ -180,5 +180,9 @@ def residuals(p,data,t):
 
 def func(x, a, b):
 	return a*exp(-x/b)
+
+
+def func2(x, a,b,c,d):
+	return (a*exp(-x/b) + c*exp(-x/d))
 	   
 
