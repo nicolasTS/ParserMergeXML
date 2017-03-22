@@ -21,43 +21,49 @@ setup_plot_prms()
 
 ###############################################################################################################
 
-path ="batch_kass_re16"
+path ="batch_kass_re19"
 files = "analysis_PRMS_Glu_sumOpen.txt"
 
 # valeurs de ref PRMS / output
-refX = 0.55
+refX = 0.2 #0.55 #10.0 #0.55
 #refY = 0.486434368805
 
+step = 10
 # range PRMS et GLU utilse pour faire les simu
-xi = np.logspace(-3,4,200) #np.linspace(x.min(), x.max(), 200)
-yi = np.logspace(-3,3,200) #np.linspace(y.min(), y.max(),  200)
+xi = np.logspace(-3,4,40*step) #np.linspace(x.min(), x.max(), 200)
+yi = np.logspace(-3,3,40*step) #np.linspace(y.min(), y.max(),  200)
 
 # a = peak b = 	auc, c = decay
 colDataToPlot = "decay"
 
-
+graphTitle ="SumOpen" 
 # X and Y labels
 xAxisLabel = "PRMS"
 yAxisLabel = "[Glu] (mM)"
-zAxisLabel = "decay" #Peak sumOpen"
+zAxisLabel = colDataToPlot #"Peak"
 
 ###############################################################################################################
 
 
 outName = files[:-4] + '_' +colDataToPlot
 
-graphTitle ="" #"with [ACh] = 10 mM"
+
 
 x, y , a, b, c = np.loadtxt(path + os.sep +  files,unpack=True)
 
+
+
+
 if (colDataToPlot == "peak"):
-	print colDataToPlot
+	#print colDataToPlot
 	z= a 
 if (colDataToPlot == "auc"):
 	z = b
 if (colDataToPlot == "decay"):
 	z = c
 
+print max(z)
+print np.argmax(z)
 ###############################################################################################################
 # contour
 ###
@@ -68,8 +74,14 @@ xi = np.logspace(-3,3,200) #np.linspace(x.min(), x.max(), 200)
 yi = np.logspace(-3,2,200) #np.linspace(y.min(), y.max(),  200)
 """
 
+
+
 #Through the unstructured data get the structured data by interpolation
-zi = griddata(x, y, z, xi,yi, interp='linear') #interp='nn')
+#zi = griddata(x, y, z, xi,yi) #, interp='cubic') #interp='nn') linear
+
+zi = griddata(y, x, z, yi,xi, interp='linear') #interp='nn') linear
+
+
 
 
 fig = plt.figure()
@@ -93,11 +105,10 @@ plt.plot(xaline, yaline, lw = 5,  color = 'black')
 
 #plt.plot(refY, refX, marker = 'x', markersize =20, markeredgewidth = 5,  color = 'black', label= "Initial value " + str(refX))
 
-
 cbar = plt.colorbar(CS)
 
-
 #CS.set_clim(0, 0.1)
+
 
 drop_spines(plt.gca())
 
