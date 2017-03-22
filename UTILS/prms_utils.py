@@ -177,4 +177,8 @@ def expl(t,p):
 def residuals(p,data,t):
 	err = data - expl(t,p)
 	return err
-	    
+
+def func(x, a, b):
+	return a*exp(-x/b)
+	   
+
