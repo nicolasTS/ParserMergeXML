@@ -6,6 +6,8 @@ from pylab import *
 import numpy as np
 
 from scipy.optimize import leastsq
+from scipy.optimize import curve_fit
+
 import matplotlib.pyplot as plt
 
 from prms_utils import *
@@ -33,40 +35,6 @@ outName =  os.path.basename(fileName)[:-4]
 dataX, dataY = np.loadtxt(fileName, unpack= True)
 
 
-
-from pylab import *
-from scipy.optimize import curve_fit
-"""
-#x = np.array([399.75, 989.25, 1578.75, 2168.25, 2757.75, 3347.25, 3936.75, 4526.25, 5115.75, 5705.25])
-#y = np.array([109,62,39,13,10,4,2,0,1,2])
-
-def func(x, a, b):
-	return a*exp(-x/b)
-#   return a*np.exp(-c*(x-b))+d
-
-peak = max(dataY)
-timeForPeak = np.argmax(dataY)
-
-
-
-dataXcut=dataX[timeForPeak:]
-dataYcut=dataY[timeForPeak:]
-
-
-popt, pcov = curve_fit(func, dataXcut, dataYcut, [peak,max(dataX)])
-print popt
-
-plot(dataXcut,dataYcut)
-x=linspace(0,100,10)
-plot(x,func(x,*popt), "-x")
-xlim(0,100)
-ylim(0,1)
-
-show()
-
-
-sys.exit()
-"""
 peak = max(dataY)
 timeForPeak = np.argmax(dataY)
 
@@ -77,7 +45,10 @@ dataXcut=dataX[timeForPeak:]
 dataYcut=dataY[timeForPeak:]
 
 def func(x, a, b):
-	return a*exp(-x/b)
+	return (a*exp(-x/b))
+
+def func2(x, a,b,c,d):
+	return (a*exp(-x/b) + c*exp(-x/d))
 
 def expl(t,p):
 	return(p[0]*exp(-t/p[1]))
@@ -93,26 +64,19 @@ def residuals2(p,data,t):
 	    err = data - dbexpl2(t,p)
 	    return err
 
-"""   
-p0 = [peak,max(dataX)] # initial guesses
-
-pbest = leastsq(residuals,p0,args=(dataYcut,dataXcut),full_output=1)
-print 'Decay time fit with mono exp ',pbest[0][1]
-
-
-p02=[peak,10,10,10]
-pbest2 = leastsq(residuals2,p02,args=(dataYcut,dataXcut),full_output=1)
-print 'Best fit parameters with bi exp ', pbest2[0]
-"""
 
 
 popt, pcov = curve_fit(func, dataXcut, dataYcut, [peak,max(dataX)])
-print popt
+print "FIT MonoExp ", popt
+
+popt2, pcov2 = curve_fit(func2, dataXcut, dataYcut, [peak,max(dataX), peak,max(dataX)], maxfev = 100000)
+print "FIT2 BiExp", popt2
+
 
 print 'AUC ',auc
 print "Peak " , peak
 
-graphTitle ="Decay time of  "+ str(round(popt[1], 2)) + " fit with mono exp \n AUC of " + str(round(auc, 2)) + "\nPeak " + str(round(peak,2))
+graphTitle ="Decay time of  "+ str(round(popt2[1], 2)) + " fit with Bi exp \n AUC of " + str(round(auc, 2)) + "\nPeak " + str(round(peak,2))
 
 Fig = plt.figure(num=None)
 
@@ -124,10 +88,14 @@ plt.plot(dataX, dataY, color = 'black', label = "data")
 
 # plot fit
 x=linspace(dataX[timeForPeak], max(dataX),len(dataX))
-plt.plot(x,func(x,*popt),color = 'red', lw = 4, label ="fit")
+plt.plot(x,func(x,*popt),color = 'red', lw = 4, label ="fit Mono")
+plt.plot(x,func2(x,*popt2),color = 'green', lw = 4, label ="fit Bi")
+
 
 
 plt.ylim(0,max(dataY))
+
+plt.xlim(0,100)
 
 plt.legend()
 
