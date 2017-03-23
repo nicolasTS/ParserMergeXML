@@ -16,9 +16,9 @@ import shutil
 
 # Ligand
 
-values = np.logspace(-6,0,50)
+values = np.logspace(-3,2,50)
 
-outDirectory = "DRC_ACh_TEST"
+outDirectory = "DRC_Glu_TEST"
 
 if(os.path.isdir(outDirectory) != True):
 		os.mkdir(outDirectory)
@@ -74,7 +74,7 @@ for i, iconc in enumerate(values):
 
 
 
-	simu_params['valuePulse'] = [0,0, iconc, 0, 0, 0]
+	simu_params['valuePulse'] = [iconc, 0, 0]
 
 	simu_params['outDirectory'] = basePath
 
