@@ -26,9 +26,10 @@ valuePRMS = float(sys.argv[3]) #2.7e-07
 
 #tmpInter = np.linspace(valuePRMS/perCent,valuePRMS*perCent,nbPoints)
 #tmpInter = np.linspace(1e-6,1e0, 40)
-tmpInter = np.logspace(-3,3,40)
 
-valuesDRC = np.logspace(-3,2,20)
+tmpInter = np.logspace(-3,4,6)
+
+valuesDRC = np.logspace(-3,3,6)
 
 #######################################################################################################################
 values = []
@@ -136,15 +137,38 @@ for i, iconc in enumerate(values):
 
 		os.system("sed -i -e 's/ODESystems/ODESystems_"+str(iDRC)+"/g' "+ basePath + os.sep+ "SimulatoreCore_"+str(iDRC)+".py")
 		os.system("sed -i -e 's/SaveData/SaveData_"+str(iDRC)+"/g' "+ basePath + os.sep+ "SimulatoreCore_"+str(iDRC)+".py")
+		# local 
+		#os.system("cd "+ basePath + "; python SimulatoreCore_"+str(iDRC) +".py "+ fPRMS + " &") 
 
-		os.system("cd "+ basePath + "; python SimulatoreCore_"+str(iDRC) +".py "+ fPRMS + " &") 
+# for cluster mode
+		fileLaunchBatch = open(basePath +os.sep + "launch_"+str(iDRC)+".sh",'w')
+		fileLaunchBatch.write("#!/usr/bin/env bash \n#Job name \n#SBATCH -J ")
+		fileLaunchBatch.write("Jobs_"+str(compteur) + " \n")
+		fileLaunchBatch.write("#SBATCH --mem-per-cpu=500 \n")
+		fileLaunchBatch.write("#SBATCH --ntasks 1 \n")
+		fileLaunchBatch.write("#SBATCH --time=3 \n")
+		fileLaunchBatch.write("echo 'LOCALID = ' $SLURM_LOCALID \n")
+		fileLaunchBatch.write("echo 'PROCID = ' $SLURM_PROCID \n")
+		fileLaunchBatch.write("scontrol show jobid -dd ${SLURM_JOBID} \n")
+		fileLaunchBatch.write("srun python SimulatoreCore_"+str(iDRC)+".py " + fPRMS) 
+		fileLaunchBatch.close()
+
+		os.system("cd "+ basePath +os.sep + "; sbatch launch_"+str(iDRC)+".sh")
+
+
+	
+		sys.stdout.flush()
+		print "Simulation #"+ str(compteur) + " / " + str(maxSimu) + " launched"
+		sys.stdout.flush()
+
 	"""	
 	#print "python SimulatoreCore.py "+ str(fPRMS) 
 	os.system("cd "+ outDirectory +os.sep + "; python SimulatoreCore.py "+ fPRMS + " &") 
 	time.sleep(3)
 	"""	
 	
-	print "Simulation #"+ str(compteur) + " / " + str(maxSimu) + " launched"
+
+	
 
 sys.exit()
 
