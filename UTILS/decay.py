@@ -95,7 +95,7 @@ plt.plot(x,func2(x,*popt2),color = 'green', lw = 4, label ="fit Bi")
 
 plt.ylim(0,max(dataY))
 
-plt.xlim(0,100)
+#plt.xlim(0,100)
 
 plt.legend()
 
