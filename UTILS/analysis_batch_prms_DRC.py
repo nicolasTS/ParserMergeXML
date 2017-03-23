@@ -13,10 +13,12 @@ import math, sys, md5, time
 
 
 #################################################
-path = "batch_kass_re1"
+tag ="kdiss_re12"
+
+path = "batch_"+tag
 Xfile="Glu"
 Yfile="sumOpen"
-namePRMS = "kass_re1"
+namePRMS = tag #"kass_re12"
 cstesBase = "Cstes"
 ncpus=int(4)
 #################################################
@@ -54,12 +56,12 @@ def maxValue3D(fileCste, namePRMS, fileNameX, fileNameY):
 	dataXcut=X2[timeForPeak:]
 	dataYcut=Y2[timeForPeak:]
 	try: 
-		#popt, pcov = curve_fit(func, dataXcut, dataYcut, [maxDataY,max(X2)], maxfev = 100000)
-		popt, pcov = curve_fit(func2, dataXcut, dataYcut, [maxDataY,max(X2), maxDataY,max(X2)], maxfev = 100000)
+		popt, pcov = curve_fit(func, dataXcut, dataYcut, [maxDataY,max(X2)], maxfev = 10000)
+		#popt, pcov = curve_fit(func2, dataXcut, dataYcut, [maxDataY,max(X2), maxDataY,max(X2)], maxfev = 1000)
 
 		decay = popt[1]
 	except:
-		print "no Fit with mono exp "
+		print "no Fit with bi exp "
 		decay = 666
 	#p0 = [maxDataY,max(X2)] # initial guesses
 	#pbest = leastsq(residuals,p0,args=(dataYcut,dataXcut),full_output=1)
