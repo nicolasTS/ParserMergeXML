@@ -13,14 +13,14 @@ import math, sys, md5, time
 
 
 #################################################
-tag ="kdiss_re12"
+tag ="k_GTPase2"
 
 path = "batch_"+tag
-Xfile="Glu"
-Yfile="sumOpen"
+Xfile="ACh"
+Yfile="IP3"
 namePRMS = tag #"kass_re12"
 cstesBase = "Cstes"
-ncpus=int(4)
+ncpus=int(20)
 #################################################
 
 
@@ -35,9 +35,9 @@ valueYfileDecay = []
 def maxValue3D(fileCste, namePRMS, fileNameX, fileNameY):
 	""" calcule max value for a txt file """
 	import numpy as np
-	from prms_utils import *
+	from prms_utils import func, func2
 	
-	#from scipy.optimize import curve_fit
+	from scipy.optimize import curve_fit
 
 	for line in file(fileCste, 'r' ):
 		if not line.startswith('#'):
@@ -61,7 +61,7 @@ def maxValue3D(fileCste, namePRMS, fileNameX, fileNameY):
 
 		decay = popt[1]
 	except:
-		print "no Fit with bi exp "
+		print "no Fit with Mono exp, check output to delete 666 for decay"
 		decay = 666
 	#p0 = [maxDataY,max(X2)] # initial guesses
 	#pbest = leastsq(residuals,p0,args=(dataYcut,dataXcut),full_output=1)
@@ -136,11 +136,13 @@ lsrt= sorted(numberR.iteritems(), key=operator.itemgetter(1))
 #ecrire dans un fichier txt
 
 sortFile = file(path + "/analysis_PRMS_" + Xfile + "_" + Yfile + ".txt", 'a')
-print>>sortFile, "#  "+str(namePRMS) + " "+ str(Xfile) + "   " +str(Yfile) + str("AUC  Decay")
+print>>sortFile, "#  "+str(namePRMS) + "  "+ str(Xfile) + "   " +str(Yfile) + "  " + str("AUC  Decay")
+print>>sortFile, "# Warning 666 for decay = no good fit \n" 
+
 for ivalue in lsrt:
 	# pour enlever les cas ou pas possible de faire un fit
-	if (ivalue[1][4] != 666.0):
-		print>>sortFile, str(ivalue[1][0]) + " " +str(ivalue[1][1])+ " " +str(ivalue[1][2])+" " +str(ivalue[1][3])+" " +str(ivalue[1][4])
+	#if (ivalue[1][4] != 666.0):
+	print>>sortFile, str(ivalue[1][0]) + " " +str(ivalue[1][1])+ " " +str(ivalue[1][2])+" " +str(ivalue[1][3])+" " +str(ivalue[1][4])
 
 
  
