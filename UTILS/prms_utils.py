@@ -150,6 +150,7 @@ def EC50(dataX, dataY):
 		normMin2 = min(dataY)
 		dataY = dataY/normMin2
 
+
 	### FIT + EC50
 
 	peval1 = lambda p,x : p[0]/(1.0+(p[1]/x)**p[2])
@@ -161,15 +162,43 @@ def EC50(dataX, dataY):
 	p0 = [1.0,1.0,1.0]
 
 	if(dataY[0] > dataY[len(dataY)-1]):
-		plsq,sucess = leastsq(residu2,p0,args=(array(dataX),array(dataY)),maxfev=5000)
+		plsq,sucess = leastsq(residu2,p0,args=(array(dataX),array(dataY)),maxfev=50000, epsfcn=0.01)
 
 
 	if(dataY[len(dataY)-1] > dataY[0]):
-		plsq,sucess = leastsq(residu1,p0,args=(array(dataX),array(dataY)),maxfev=5000)
-	
-	return plsq
+		plsq,sucess = leastsq(residu1,p0,args=(array(dataX),array(dataY)),maxfev=50000 ,epsfcn=0.01)
+
+	return plsq, sucess
 
 ##############################################################################################################################
+
+def Bi_EC50(dataX, dataY):
+	normMin = min(dataY)
+	dataY = dataY - normMin
+	normMax = max(dataY)
+	dataY = dataY/normMax
+
+	pevalA= lambda p,x : (p[0] / (1.0+ ((p[1]/x)**p[2])) + (p[3] / (1.0 + (p[4]/x)**p[5])))
+	residuA = lambda p,x,y : pevalA(p,x) - y
+
+	pA = [1.0,1.0,1.0,1.0, 1.0, 1.0]
+	plsqA,sucessA = leastsq(residuA,pA,args=(array(dataX),array(dataY)),maxfev=500000 ,epsfcn=0.005)
+
+	return plsqA, sucessA
+
+##############################################################################################################################
+
+
+"""
+pevalA= lambda p,x : (p[0] / (1.0+ ((p[1]/x)**p[2])) + (p[3] / (1.0 + (p[4]/x)**p[5])))
+residuA = lambda p,x,y : pevalA(p,x) - y
+
+pA = [1.0,1.0,1.0,1.0, 1.0, 1.0]
+plsqA,sucessA = leastsq(residuA,pA,args=(array(dataX),array(dataY)),maxfev=500000 ,epsfcn=0.005)
+"""
+
+
+
 
 def expl(t,p):
 	return(p[0]*exp(-t/p[1]))
