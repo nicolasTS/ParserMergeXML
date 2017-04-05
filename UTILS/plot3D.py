@@ -20,27 +20,28 @@ from prms_utils import *
 setup_plot_prms()
 
 ###############################################################################################################
-
-path ="batch_kass_re19"
-files = "analysis_PRMS_Glu_sumOpen.txt"
-
+tag = str(sys.argv[1]) #"k_reconst"
 # valeurs de ref PRMS / output
-refX = 0.2 #0.55 #10.0 #0.55
-#refY = 0.486434368805
-
-step = 10
-# range PRMS et GLU utilse pour faire les simu
-xi = np.logspace(-3,4,40*step) #np.linspace(x.min(), x.max(), 200)
-yi = np.logspace(-3,3,40*step) #np.linspace(y.min(), y.max(),  200)
-
+refX = float(sys.argv[2]) #0.001 #3.02 #0.0255 #3.02 
 # a = peak b = 	auc, c = decay
-colDataToPlot = "decay"
+colDataToPlot = str(sys.argv[3])
 
-graphTitle ="SumOpen" 
+
+path ="batch_" + tag 
+files = "analysis_PRMS_ACh_IP3.txt"
+
+
+step = 4
+
+
+#listOption = ["peak", "auc", "decay"]
+#if str(colDataToPlot) 
+
+graphTitle ="" 
 # X and Y labels
-xAxisLabel = "PRMS"
-yAxisLabel = "[Glu] (mM)"
-zAxisLabel = colDataToPlot #"Peak"
+xAxisLabel = tag #"PRMS"
+yAxisLabel = "[ACh] (mM)"
+zAxisLabel = colDataToPlot + " [IP3] ()" #"Peak"
 
 ###############################################################################################################
 
@@ -52,6 +53,15 @@ outName = files[:-4] + '_' +colDataToPlot
 x, y , a, b, c = np.loadtxt(path + os.sep +  files,unpack=True)
 
 
+# range PRMS et GLU utilse pour faire les simu
+tmp_interA= ('{:.2e}'.format(min(x))).split('e')[1]
+tmp_interB= ('{:.2e}'.format(max(x))).split('e')[1]
+xi = np.logspace(int(tmp_interA),int(tmp_interB),20*step) 
+
+tmp_interAY= ('{:.2e}'.format(min(y))).split('e')[1]
+tmp_interBY= ('{:.2e}'.format(max(y))).split('e')[1]
+yi = np.logspace(int(tmp_interAY),int(tmp_interBY),20*step) 
+
 
 
 if (colDataToPlot == "peak"):
@@ -60,21 +70,25 @@ if (colDataToPlot == "peak"):
 if (colDataToPlot == "auc"):
 	z = b
 if (colDataToPlot == "decay"):
-	z = c
 
-print max(z)
-print np.argmax(z)
+	for idecay in range(len(c)):
+		#if (c[idecay] == 666.0):
+		print "pb fit decay"
+		index = np.argwhere(c==666.0)
+		c = np.delete(c, index)
+		x = np.delete(x, index)
+		y = np.delete(y, index)
+		a = np.delete(a, index)
+		b = np.delete(b, index)
+
+
+			#sys.exit()
+	z = c
+	
+
 ###############################################################################################################
 # contour
 ###
-
-"""
-# range PRMS et GLU utilse pour faire les simu
-xi = np.logspace(-3,3,200) #np.linspace(x.min(), x.max(), 200)
-yi = np.logspace(-3,2,200) #np.linspace(y.min(), y.max(),  200)
-"""
-
-
 
 #Through the unstructured data get the structured data by interpolation
 #zi = griddata(x, y, z, xi,yi) #, interp='cubic') #interp='nn') linear
