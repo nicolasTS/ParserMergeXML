@@ -13,14 +13,14 @@ import math, sys, md5, time
 
 
 #################################################
-tag ="k_GTPase2"
+tag =str(sys.argv[1]) #"k_reconst" #
 
 path = "batch_"+tag
 Xfile="ACh"
 Yfile="IP3"
 namePRMS = tag #"kass_re12"
 cstesBase = "Cstes"
-ncpus=int(20)
+ncpus=int(18)
 #################################################
 
 
@@ -56,12 +56,26 @@ def maxValue3D(fileCste, namePRMS, fileNameX, fileNameY):
 	dataXcut=X2[timeForPeak:]
 	dataYcut=Y2[timeForPeak:]
 	try: 
-		popt, pcov = curve_fit(func, dataXcut, dataYcut, [maxDataY,max(X2)], maxfev = 10000)
+		popt, pcov = curve_fit(func, dataXcut, dataYcut, [maxDataY,max(X2)]) #, maxfev = 1000)
 		#popt, pcov = curve_fit(func2, dataXcut, dataYcut, [maxDataY,max(X2), maxDataY,max(X2)], maxfev = 1000)
+		stder = np.sqrt(np.diag(pcov))
+		threshold = 0.1
 
-		decay = popt[1]
+		if (stder[1] < (popt[1]*threshold)):
+			decay = popt[1]
+			#print "Decay= " + str(popt[1]) + " STDR= " + str(stder[1]) + " PRMS= " + str(namePRMS) + "FILE CSTE = " + str(fileCste)
+		else:
+			popt, pcov = curve_fit(func2, dataXcut, dataYcut, [maxDataY,max(X2), maxDataY,max(X2)]) #, maxfev = 1000)
+
+			stder2 = np.sqrt(np.diag(pcov))
+			if (stder2[1] < (popt[1]*threshold)):
+				decay = popt[1]
+				#print "mauvais fit"+ " PRMS= " + str(namePRMS) + "FILE CSTE = " + str(fileCste)
+			else:
+				#print "pb"
+				decay = 666
 	except:
-		print "no Fit with Mono exp, check output to delete 666 for decay"
+		print "no Fit with Mono exp and exp , check output to delete 666 for decay"
 		decay = 666
 	#p0 = [maxDataY,max(X2)] # initial guesses
 	#pbest = leastsq(residuals,p0,args=(dataYcut,dataXcut),full_output=1)
