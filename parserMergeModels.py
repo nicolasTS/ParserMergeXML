@@ -626,21 +626,25 @@ def writeSaveData(merge_params):
 #exec("from PRMS import *")
 
 paramfilepath = sys.argv[1]
-print " paramfilepath = " + str(paramfilepath.rstrip(".py"))
 exec("from "+paramfilepath.rstrip(".py")+" import *") 
 
+nbXMLFiles = len(merge_params['listXMLFiles']) 
+print " paramfilepath = " + str(paramfilepath.rstrip(".py")) + " with " + str(nbXMLFiles) + " XML files"
 
 # obliger de faire comme cela car boucle ne marche pas probleme de segmentation
 listeModels = []
 
+# oblige de faire des if sinon marche pas ...
+if (nbXMLFiles == 1):
+	document1 = readSBML(merge_params['listXMLFiles'][0]);
+	listeModels.append(document1.getModel());
+if (nbXMLFiles == 2):
 
-document1 = readSBML(merge_params['listXMLFiles'][0]);
-listeModels.append(document1.getModel());
+	document1 = readSBML(merge_params['listXMLFiles'][0]);
+	listeModels.append(document1.getModel());
+	document2 = readSBML(merge_params['listXMLFiles'][1]);
+	listeModels.append(document2.getModel());
 
-"""
-document2 = readSBML(merge_params['listXMLFiles'][1]);
-listeModels.append(document2.getModel());
-"""
 
 print "List of XML files: "
 print listeModels
