@@ -22,14 +22,34 @@ exec("from "+paramfilepath+" import *")
 namePRMS = sys.argv[2] #"kf_G1"
 valuePRMS = float(sys.argv[3]) #2.7e-07
 
+stepInter = 3
+
+tmp_inter= ('{:.2e}'.format(valuePRMS)).split('e')[1]
+A = int(tmp_inter) + stepInter
+B = int(tmp_inter) - stepInter
+
+
+tmpInter = np.logspace(int(B),int(A),20)
+
 # variation du prm cinetique 
 
 #tmpInter = np.linspace(valuePRMS/perCent,valuePRMS*perCent,nbPoints)
 #tmpInter = np.linspace(1e-6,1e0, 40)
 
-tmpInter = np.logspace(-3,4,6)
+# k_PLCassoc = 0.001
+#tmpInter = np.logspace(-6,1,20)
 
-valuesDRC = np.logspace(-3,3,6)
+# kon 
+#tmpInter = np.logspace(-3,4,5)
+
+
+# Kplc
+#tmpInter = np.logspace(-4,1,20)
+
+#valuesDRC = np.logspace(-6,0,20)
+#valuesDRC = np.logspace(-12,4, 20)
+valuesDRC = np.logspace(-6,2, 20)
+
 
 #######################################################################################################################
 values = []
@@ -116,7 +136,7 @@ for i, iconc in enumerate(values):
 
 
 		compteur+=1
-		simu_params['valuePulse'] = [iconcDRC, 0, 0]
+		simu_params['valuePulse'] = [iconcDRC, 0, 0, 0, 0, 0]
 		simu_params['outDirectory'] = basePath
 		#ecriture du fichier 
 		fPRMS = paramfilepath + "_"+ str(iDRC) + ".py"
